@@ -9,7 +9,7 @@ seed: 42
 architecture:
   base_architecture: "deit_small_patch16_224"
   radius: 1 # unit of patches 
-  img_size: 768
+  img_size: 224
   deit_small_patch16_224:
     prototype_shape: [2000, 384, 4]
   deit_tiny_patch16_224:
@@ -73,3 +73,7 @@ data:
   include_rf: false
   return_raw_images: False
   data_path: "/datasets/exactvu_pca/OPTIMUM/UA_OL_PU_annotated_needles_multiframe"
+
+wandb:
+  name: ${run_name}_fold${data.fold}
+  project: prostate_prototypes

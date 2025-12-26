@@ -10,6 +10,7 @@ import argparse
 import re
 import numpy as np
 import random
+import wandb
 
 from helpers import makedir
 import model
@@ -30,6 +31,11 @@ from omegaconf import OmegaConf
 
 
 def main(cfg):
+
+    wandb.init(
+        config=OmegaConf.to_object(cfg),
+        **cfg.get('wandb', {}),
+    )
 
     img_size = cfg.architecture.img_size
     model_dir = cfg.train.model_dir
@@ -75,7 +81,7 @@ def main(cfg):
     train_loader = make_loader(dataset=train_dataset, cfg=cfg.data, shuffle=False, weighted=True, pin_memory=True, drop_last=True)
     val_loader = make_loader(dataset=val_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)
     train_push_dataset = get_datasets(cfg=cfg.data, augment=[], data_type='push', normalize=False)
-    train_push_loader = make_loader(dataset=train_push_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)
+    train_push_loader = make_loader(dataset=train_push_dataset, cfg=cfg.data, shuffle=False, weighted=True, pin_memory=False)
 
     # we should look into distributed sampler more carefully at torch.utils.data.distributed.DistributedSampler(train_dataset)
     log('training set size: {0}'.format(len(train_loader.dataset)))
@@ -181,6 +187,14 @@ def main(cfg):
         joint_lr_scheduler2.step()
         accu, tst_loss = tnt.test(model=ppnet, dataloader=val_loader,
                         class_specific=class_specific, log=log, clst_k=cfg.train.k, sum_cls = cfg.train.sum_cls)
+
+        wandb.log({
+            "epoch": epoch
+            "train_loss": train_loss,
+            "val_loss": tst_loss,
+            "accuracy": accu
+        }    
+        )
         
         save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'slots', accu=accu,
                                     target_accu=0.75, log=log)

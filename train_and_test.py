@@ -24,7 +24,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     total_orth_loss = 0 
     total_comp_loss = 0 
     total_loss = 0 
-    for i, (image, label) in enumerate(dataloader):
+    for i, data in enumerate(dataloader):
+        image, label = data['bmode'], data['primus_label']
         input = image.cuda()
         target = label.cuda()
 
