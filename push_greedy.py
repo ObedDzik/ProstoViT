@@ -1,67 +1,92 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2
 import os
 import copy
 import time
 import torch.nn.functional as F
 
 from helpers import makedir, find_high_activation_crop
+from PIL import Image, ImageDraw
+import matplotlib.pyplot as plt
+import os
 
-def save_prototype_original_img_with_bbox(dir_for_saving_prototypes, img_dir,prototype_img_filename_prefix,j,
+def save_prototype_original_img_with_bbox(dir_for_saving_prototypes, img_dir, prototype_img_filename_prefix, j,
                                           sub_patches,
                                           indices,
-                                          bound_box_j, color=(0, 255, 255)):
+                                          bound_box_j, color=(255, 255, 0)):
     """
     a modified bbox function that takes the bound_box_j that contains k patches 
     and return the deformed boudning boxes 
 
     color for first selected (from top to bottom):
     Yellow, red, green, blue 
+    
+    Note: color parameter now expects RGB format instead of BGR
     """
     save_dir = os.path.join(dir_for_saving_prototypes,
                  prototype_img_filename_prefix + 'bbox-original' + str(j) +'.png')
-    p_img_bgr = cv2.imread(img_dir)
-    img_bbox = p_img_bgr.copy()
-    # cv2.rectangle(p_img_bgr, (bbox_width_start, bbox_height_start), (bbox_width_end-1, bbox_height_end-1),
-    #               color, thickness=2)
-    colors = [(0, 255, 255), (255, 0, 0), (0, 255, 0), (0,0, 255)]
-    mask_val = np.ones((14,14))*0.4 # set everything else to be 0.2
+    
+    # Load image using PIL
+    p_img = Image.open(img_dir).convert('RGB')
+    p_img_array = np.array(p_img)
+    
+    # Create a copy for drawing bounding boxes
+    img_bbox = p_img.copy()
+    draw_bbox = ImageDraw.Draw(img_bbox)
+    
+    # Draw on original image
+    draw_original = ImageDraw.Draw(p_img)
+    
+    # Colors in RGB format (converted from BGR)
+    colors = [(255, 255, 0), (0, 0, 255), (0, 255, 0), (255, 0, 0)]  # Yellow, Red, Green, Blue
+    
+    mask_val = np.ones((14, 14)) * 0.4  # set everything else to be 0.4
+    
     for k in range(sub_patches):
-        if bound_box_j[1,k] != -1:
+        if bound_box_j[1, k] != -1:
             # draw k 16x16 bounding boxes if the patches are included 
-            x,y = indices[0][k], indices[1][k]
-            mask_val[x,y] = 1
-            bbox_height_start_k = bound_box_j[1,k]
-            bbox_height_end_k = bound_box_j[2,k]
-            bbox_width_start_k = bound_box_j[3,k]
-            bbox_width_end_k = bound_box_j[4,k]
+            x, y = indices[0][k], indices[1][k]
+            mask_val[x, y] = 1
+            bbox_height_start_k = bound_box_j[1, k]
+            bbox_height_end_k = bound_box_j[2, k]
+            bbox_width_start_k = bound_box_j[3, k]
+            bbox_width_end_k = bound_box_j[4, k]
             color = colors[k]
-            #cv2.rectangle(img_bbox, (bbox_width_start_k, bbox_height_start_k), (bbox_width_end_k-1, bbox_height_end_k-1),
-                    #color, thickness=1)
-            cv2.rectangle(p_img_bgr, (bbox_width_start_k, bbox_height_start_k), (bbox_width_end_k-1, bbox_height_end_k-1),
-                    color, thickness=2)
-    p_img_rgb = p_img_bgr[...,::-1]
+            
+            # Draw rectangles (PIL uses (left, top, right, bottom) format)
+            # For thickness=1 on img_bbox (not used in final output, so commented out)
+            # draw_bbox.rectangle([(bbox_width_start_k, bbox_height_start_k), 
+            #                      (bbox_width_end_k-1, bbox_height_end_k-1)],
+            #                     outline=color, width=1)
+            
+            # For thickness=2 on original image
+            draw_original.rectangle([(bbox_width_start_k, bbox_height_start_k), 
+                                    (bbox_width_end_k-1, bbox_height_end_k-1)],
+                                   outline=color, width=2)
+    
+    # Convert to RGB array and normalize
+    p_img_rgb = np.array(p_img)
     p_img_rgb = np.float32(p_img_rgb) / 255
-    plt.imsave(save_dir, p_img_rgb,vmin=0.0,vmax=1.0)
+    plt.imsave(save_dir, p_img_rgb, vmin=0.0, vmax=1.0)
+    
     size = p_img_rgb.shape[1]
     
-    img_bbox_rgb = np.clip(img_bbox + 150, 0, 255)# increase the brightness
-    img_bbox_rgb = img_bbox[...,::-1]
+    # Process bbox image
+    img_bbox_array = np.array(img_bbox)
+    img_bbox_rgb = np.clip(img_bbox_array + 150, 0, 255)  # increase the brightness
     img_bbox_rgb = np.float32(img_bbox_rgb) / 255
-    width = size//14
+    width = size // 14
     
-    #bb_og = p_img_rgb.copy()
+    # Apply mask
     for i in range(0, 196):
-        x = i %14
-        y = i//14
-        img_bbox_rgb[y*width:(y+1)*width, x*width:(x+1)*width]*=mask_val[y,x]
-        #bb_og[y*width:(y+1)*width, x*width:(x+1)*width]*=mask_val[y,x]
+        x = i % 14
+        y = i // 14
+        img_bbox_rgb[y*width:(y+1)*width, x*width:(x+1)*width] *= mask_val[y, x]
 
     save_dir2 = os.path.join(dir_for_saving_prototypes,
-                 prototype_img_filename_prefix + '_vis_' + str(j) +'.png')
-    plt.imsave(save_dir2, img_bbox_rgb,vmin=0.0,vmax=1.0)
+                 prototype_img_filename_prefix + '_vis_' + str(j) + '.png')
+    plt.imsave(save_dir2, img_bbox_rgb, vmin=0.0, vmax=1.0)
     
     #save_dir3 = os.path.join(dir_for_saving_prototypes,
                  #prototype_img_filename_prefix + '_vis_bb_' + str(j) +'.png')

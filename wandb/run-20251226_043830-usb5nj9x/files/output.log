@@ -1,0 +1,69 @@
+Indexing frames: 100%|██████████| 23474/23474 [00:10<00:00, 2158.79it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:03<00:00, 6634.11it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:07<00:00, 3339.45it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:03<00:00, 7731.59it/s]
+training set size: 18420
+push set size: 18420
+val set size: 4408
+batch size: 4
+https://dl.fbaipublicfiles.com/deit/deit_small_patch16_224-cd65a155.pth
+cuda
+start training
+Initial weight coefs: {'crs_ent': 1, 'clst': -0.8, 'sep': 0.1, 'l1': 0.01, 'orth': 0.001, 'coh': 0.003}
+============================================================
+STAGE 1 & 2: WARM-UP AND JOINT TRAINING
+============================================================
+epoch: 	0
+	warm
+	train
+/project/6106383/obed/medproj/ProstoViT/model.py:207: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_row = torch.tensor(center_row+self.radius - small_size // 2)
+/project/6106383/obed/medproj/ProstoViT/model.py:208: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_col = torch.tensor(center_col+self.radius - small_size // 2)
+	time: 	596.19s
+	total loss: 	124.6632
+	cross ent: 	12.9292
+	cluster: 	0.5347
+	separation:	0.5972
+	avg separation:	0.0111
+	orthogonal loss:	72098.8856
+	coherence loss:	1.0441
+	l1: 		6000.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	8000.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	58.63%
+	p dist pair: 	980.0699
+	test
+	time: 	116.30s
+	cross ent: 	42.0959
+	cluster: 	0.6736
+	separation:	0.7056
+	avg separation:	0.0113
+	orthogonal loss:	8107.4360
+	coherence loss:	1.0671
+	l1: 		6000.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	8000.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.93%
+	p dist pair: 	980.0699
+*** New best model saved with accuracy: 0.37% at epoch 0 ***
+epoch: 	1
+	warm
+	train
+	time: 	586.84s
+	total loss: 	57.2205
+	cross ent: 	9.8963
+	cluster: 	0.6374
+	separation:	0.6804
+	avg separation:	0.0130
+	orthogonal loss:	7762.8773
+	coherence loss:	1.0680
+	l1: 		6000.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	8000.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	60.67%
+	p dist pair: 	1014.8283
+	test

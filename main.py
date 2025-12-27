@@ -1,3 +1,4 @@
+
 import os
 import shutil
 import torch
@@ -39,11 +40,11 @@ def main(cfg):
 
     img_size = cfg.architecture.img_size
     model_dir = cfg.train.model_dir
-    makedir(model_dir, exist_ok=True)
+    makedir(model_dir)
 
     log, logclose = create_logger(log_filename=os.path.join(model_dir, 'train.log'))
     img_dir = os.path.join(model_dir, 'img')
-    makedir(img_dir, exist_ok=True)
+    makedir(img_dir)
 
     weight_matrix_filename = 'outputL_weights'
     prototype_img_filename_prefix = 'prototype-img'
@@ -172,10 +173,29 @@ def main(cfg):
 
         accu, tst_loss = tnt.test(model=ppnet, dataloader=val_loader,
                         class_specific=class_specific, log=log, clst_k=cfg.train.k,sum_cls = cfg.train.sum_cls)
+        
+        wandb.log({
+            "epoch": epoch,
+            "phase": "warm" if epoch < cfg.train.num_warm_epochs else "joint",
+            "train/accuracy": train_loss["acc"],
+            "train/cross_entropy": train_loss["cross entropy Loss"],
+            "train/cluster_loss": train_loss["clst loss"],
+            "train/separation_loss": train_loss["sep loss"],
+            "train/orthogonal_loss": train_loss["orth loss"],
+            "train/l1_loss": train_loss["l1 loss"],
+            "val/accuracy": tst_loss["acc"],
+            "val/cross_entropy": tst_loss["cross entropy Loss"],
+            "val/cluster_loss": tst_loss["clst loss"],
+            "val/separation_loss": tst_loss["sep loss"],
+            "val/orthogonal_loss": tst_loss["orth loss"],
+            "val/l1_loss": tst_loss["l1 loss"],
+            "accuracy": accu,
+            "learning_rate": warm_optimizer.param_groups[0]['lr'] if epoch < cfg.train.num_warm_epochs else joint_optimizer.param_groups[0]['lr']
+        })
+
         save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'nopush', accu=accu,
                                     target_accu=0.75, log=log)
         # version 1, learn slots before push 
-    from settings import coefs_slots
     coh_weight = cfg.train.coefs_slots['coh']
     coefs['coh']  = coh_weight
     log(f'Coefs for slots training: {coefs}')
@@ -188,12 +208,24 @@ def main(cfg):
         accu, tst_loss = tnt.test(model=ppnet, dataloader=val_loader,
                         class_specific=class_specific, log=log, clst_k=cfg.train.k, sum_cls = cfg.train.sum_cls)
 
-        wandb.log({
-            "epoch": epoch
-            "train_loss": train_loss,
-            "val_loss": tst_loss,
-            "accuracy": accu
-        }    
+        wandb.log(
+            {
+            "epoch": num_train_epochs + epoch,  # Continue epoch numbering
+            "phase": "slots",
+            "train/accuracy": train_loss["acc"],
+            "train/cross_entropy": train_loss["cross entropy Loss"],
+            "train/cluster_loss": train_loss["clst loss"],
+            "train/separation_loss": train_loss["sep loss"],
+            "train/orthogonal_loss": train_loss["orth loss"],
+            "train/l1_loss": train_loss["l1 loss"],
+            "val/accuracy": tst_loss["acc"],
+            "val/cross_entropy": tst_loss["cross entropy Loss"],
+            "val/cluster_loss": tst_loss["clst loss"],
+            "val/separation_loss": tst_loss["sep loss"],
+            "val/orthogonal_loss": tst_loss["orth loss"],
+            "val/l1_loss": tst_loss["l1 loss"],
+            "accuracy": accu,
+            }
         )
         
         save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'slots', accu=accu,
@@ -225,6 +257,24 @@ def main(cfg):
         print('Accuracy is:')
         accu, tst_loss = tnt.test(model=ppnet, dataloader=val_loader,
                             class_specific=class_specific, log=log, clst_k = cfg.train.k,sum_cls = cfg.train.sum_cls)
+        
+        wandb.log({
+            "epoch": num_train_epochs + cfg.train.slots_train_epoch + epoch,
+            "phase": "finetune",
+            "train/accuracy": train_loss["acc"],
+            "train/cross_entropy": train_loss["cross entropy Loss"],
+            "train/cluster_loss": train_loss["clst loss"],
+            "train/separation_loss": train_loss["sep loss"],
+            "train/orthogonal_loss": train_loss["orth loss"],
+            "train/l1_loss": train_loss["l1 loss"],
+            "val/accuracy": tst_loss["acc"],
+            "val/cross_entropy": tst_loss["cross entropy Loss"],
+            "val/cluster_loss": tst_loss["clst loss"],
+            "val/separation_loss": tst_loss["sep loss"],
+            "val/orthogonal_loss": tst_loss["orth loss"],
+            "val/l1_loss": tst_loss["l1 loss"],
+            "accuracy": accu,
+        })
         save.save_model_w_condition(model=ppnet, model_dir=model_dir, model_name=str(epoch) + 'finetuned', accu=accu,
                                 target_accu=0.70, log=log)
     logclose()

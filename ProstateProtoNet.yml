@@ -1,9 +1,9 @@
 ################### Experiment information ######################
 description: ProstateProtoViT model
-run_name: "ProstateProtoViT"
+run_name: "ProstateProtoViT_moreepochs"
 wandb_mode: 'online'
 abstain_class: True
-base_dir: /obed/scratch/
+base_dir: /home/obed/scratchs
 seed: 42
 
 architecture:
@@ -19,7 +19,7 @@ architecture:
 
 train:
   dropout_rate: 0.0
-  num_classes: 200
+  num_classes: 5
   prototype_activation_function: 'log'
   add_on_layers_type: 'regular'
   experiment_run: 'exp1'
@@ -37,12 +37,13 @@ train:
     'orth': 1e-3,
     'coh': 3e-3,
   }
-  coefs_slots:{'coh': 1e-6}
+  coefs_slots: {'coh': 1e-6}
   sum_cls: False
   k: 1
   sig_temp: 100
-  num_joint_epochs: 10
-  num_warm_epochs: 5
+  num_joint_epochs: 40
+  num_warm_epochs: 10
+  num_finetune_epochs: 15
   slots_train_epoch: 5
   push_start: 10
 

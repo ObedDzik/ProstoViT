@@ -1,0 +1,223 @@
+_wandb:
+    value:
+        cli_version: 0.21.2
+        e:
+            v3fu67lhlkv41h64pgojcts5vwreplws:
+                args:
+                    - -c
+                    - /home/obed/projects/aip-medilab/obed/medproj/ProstoViT/ProstateProtoNet.yml
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.8"
+                disk:
+                    /:
+                        total: "33501757440"
+                        used: "8679481344"
+                email: okdzikunu@gmail.com
+                executable: /project/6106383/obed/medproj/ProstoViT/prostenv/bin/python
+                git:
+                    commit: c0873a8d57d0fc64dd83822ffe73c05c1629f00b
+                    remote: https://github.com/ObedDzik/ProstoViT.git
+                gpu: NVIDIA L40S
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 18176
+                      memoryTotal: "48305799168"
+                      name: NVIDIA L40S
+                      uuid: GPU-b9dc648e-abab-8341-c382-399e5cb57f5f
+                host: kn012
+                memory:
+                    total: "540453662720"
+                os: Linux-6.8.0-54-generic-x86_64-Intel-R-_Xeon-R-_Gold_6338_CPU_@_2.00GHz-with-glibc2.37
+                program: /home/obed/projects/aip-medilab/obed/medproj/ProstoViT/main_debug.py
+                python: CPython 3.12.4
+                root: /project/6106383/obed/medproj/ProstoViT
+                slurm:
+                    cluster_name: killarney
+                    conf: /cm/shared/apps/slurm/var/etc/killarney/slurm.conf
+                    cpus_on_node: "16"
+                    cpus_per_task: "16"
+                    distribution: block
+                    gpus_on_node: "1"
+                    gtids: "0"
+                    job_account: aip-medilab
+                    job_cpus_per_node: "16"
+                    job_end_time: "1766772141"
+                    job_gid: "3150729"
+                    job_gpus: "1"
+                    job_group: obed
+                    job_id: "1671574"
+                    job_name: tr-proto
+                    job_nodelist: kn012
+                    job_num_nodes: "1"
+                    job_partition: gpubase_l40s_b2
+                    job_qos: normal
+                    job_start_time: "1766743341"
+                    job_uid: "3150729"
+                    job_user: obed
+                    jobid: "1671574"
+                    launch_node_ipaddr: 10.1.1.12
+                    localid: "0"
+                    mem_per_node: "65536"
+                    mpi_type: pmix
+                    nnodes: "1"
+                    nodeid: "0"
+                    nodelist: kn012
+                    nprocs: "1"
+                    ntasks: "1"
+                    ntasks_per_node: "1"
+                    pmix_mapping_serv: (vector,(0,1,1))
+                    pmixp_abort_agent_port: "41787"
+                    prio_process: "0"
+                    procid: "0"
+                    pty_port: "42389"
+                    pty_win_col: "147"
+                    pty_win_row: "23"
+                    script_context: prolog_task
+                    srun_comm_host: 10.1.1.12
+                    srun_comm_port: "38793"
+                    step_gpus: "1"
+                    step_id: "0"
+                    step_launcher_port: "38793"
+                    step_nodelist: kn012
+                    step_num_nodes: "1"
+                    step_num_tasks: "1"
+                    step_tasks_per_node: "1"
+                    stepid: "0"
+                    submit_dir: /project/6106383/obed/medproj/ProstoViT
+                    submit_host: kn091
+                    task_pid: "2968267"
+                    tasks_per_node: "1"
+                    tmpdir: /tmp
+                    topology_addr: kn012
+                    topology_addr_pattern: node
+                    tres_per_task: cpu=16
+                    umask: "0027"
+                startedAt: "2025-12-26T10:02:27.706120Z"
+                writerId: v3fu67lhlkv41h64pgojcts5vwreplws
+        m: []
+        python_version: 3.12.4
+        t:
+            "1":
+                - 1
+                - 5
+                - 41
+                - 53
+                - 63
+            "2":
+                - 1
+                - 5
+                - 41
+                - 53
+                - 63
+            "3":
+                - 13
+                - 16
+            "4": 3.12.4
+            "5": 0.21.2
+            "12": 0.21.2
+            "13": linux-x86_64
+abstain_class:
+    value: true
+architecture:
+    value:
+        base_architecture: deit_small_patch16_224
+        cait_xxs24_224:
+            prototype_shape:
+                - 2000
+                - 192
+                - 4
+        deit_small_patch16_224:
+            prototype_shape:
+                - 2000
+                - 384
+                - 4
+        deit_tiny_patch16_224:
+            prototype_shape:
+                - 2000
+                - 192
+                - 4
+        img_size: 224
+        radius: 1
+base_dir:
+    value: /home/obed/scratchs
+data:
+    value:
+        augmentations: random_crop
+        batch_size: 4
+        cohort_selection_mode: splits_file
+        crop_to_prostate: true
+        data_path: /datasets/exactvu_pca/OPTIMUM/UA_OL_PU_annotated_needles_multiframe
+        dataset: default
+        exclude_benign_cores_from_positive_patients: true
+        first_downsample_size: null
+        flip_ud: false
+        fold: 0
+        frames: first
+        image_size: 224
+        include_rf: false
+        involvement_threshold_pct: null
+        limit_train_data: null
+        mask_size: 224
+        mean:
+            - 0.485
+            - 0.456
+            - 0.406
+        n_folds: 5
+        num_workers: 8
+        return_raw_images: false
+        rf_as_bmode: false
+        splits_file: /datasets/exactvu_pca/OPTIMUM/processed/processed/UA_annotated_needles/splits.json
+        std:
+            - 0.229
+            - 0.224
+            - 0.225
+        test_center: null
+        train_subsample_seed: 42
+        undersample_benign_ratio: null
+description:
+    value: ProstateProtoViT model
+run_name:
+    value: ProstateProtoViT
+seed:
+    value: 42
+train:
+    value:
+        add_on_layers_type: regular
+        coefs:
+            clst: -0.8
+            coh: 0.003
+            crs_ent: 1
+            l1: 0.01
+            orth: 0.001
+            sep: 0.1
+        coefs_slots:{'coh': 1e-6}
+        dropout_rate: 0
+        experiment_run: exp1
+        joint_lr_step_size: 5
+        joint_optimizer_lrs:
+            features: 5e-05
+            prototype_vectors: 0.003
+        k: 1
+        last_layer_optimizer_lr: 0.0001
+        model_dir: /home/obed/scratchs/saved_models/deit_small_patch16_224/exp1/
+        num_classes: 5
+        num_joint_epochs: 10
+        num_warm_epochs: 5
+        prototype_activation_function: log
+        push_start: 10
+        sig_temp: 100
+        slots_train_epoch: 5
+        stage_2_lrs:
+            patch_select: 5e-05
+        sum_cls: false
+        warm_optimizer_lrs:
+            features: 1e-07
+            prototype_vectors: 0.003
+wandb:
+    value:
+        name: ProstateProtoViT_fold0
+        project: prostate_prototypes
+wandb_mode:
+    value: online
