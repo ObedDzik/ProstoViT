@@ -4,13 +4,14 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
 
-from tools.deit_features import deit_tiny_patch_features, deit_small_patch_features
+from tools.deit_features import deit_tiny_patch_features, deit_small_patch_features, dinov3_patch_features
 from tools.cait_features import cait_xxs24_224_features
 
 base_architecture_to_features = {'deit_small_patch16_224': deit_small_patch_features,
                                  'deit_tiny_patch16_224': deit_tiny_patch_features,
                                  #'deit_base_patch16_224':deit_base_patch16_224,
-                                 'cait_xxs24_224': cait_xxs24_224_features,}
+                                 'cait_xxs24_224': cait_xxs24_224_features,
+                                 'dinov3': dinov3_patch_features}
 
 class PPNet(nn.Module):
     def __init__(self, features, img_size, prototype_shape,
@@ -106,6 +107,14 @@ class PPNet(nn.Module):
                 cls_token = blk(x, cls_token)
             x = torch.cat((cls_token, x), dim=1)
             x = self.features.norm(x) # bsz, 197, dim
+
+        elif self.arc == 'dinov3':
+            x=self.features.patch_embed(x)
+            x = x.reshape(x.size(0), -1, x.size(-1))
+            x = torch.cat((self.features.cls_token.expand(x.size(0), -1, -1), x), dim=1)
+            for blk in self.features.blocks:
+                x=blk(x)
+            x=self.features.norm(x) # bsz, 197, dim
 
         # patch_emb that adds global info 
         x_2 = x[:, 1:] - x[:, 0].unsqueeze(1) # bsz, 196, dim
