@@ -10,6 +10,11 @@ from timm.models import create_model
 from timm.models.registry import register_model
 from timm.models.layers import trunc_normal_
 from settings import dropout_rate
+import torch
+import os
+
+DINOV3_CHECKPOINTS_PATH="/datasets/exactvu_pca/checkpoint_store"
+DINOV3_LIBRARY_PATH="/home/obed/projects/aip-medilab/obed/medproj/dinov3"
 
 __all__ = [
     'deit_tiny_patch16_224', 'deit_small_patch16_224', 'deit_base_patch16_224',
@@ -148,4 +153,19 @@ def deit_small_patch_features(pretrained=False, **kwargs):
     if pretrained:
         model = get_pretrained_weights(base_arch, model)
         del model.head
+    return model
+
+@register_model
+def dinov3_patch_features(**kwargs):
+    model = dinov3_vitl16(**kwargs)
+    def dinov3_vitl16(**kwargs):
+
+        REPO_DIR = DINOV3_LIBRARY_PATH
+        weight_basename = "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"
+        weights = os.path.join(DINOV3_CHECKPOINTS_PATH, weight_basename)
+        if not os.path.exists(weights):
+            raise FileNotFoundError(f"DINOv3 checkpoint not found: {weights}")
+        kwargs["weights"] = weights
+        model = torch.hub.load(REPO_DIR, "dinov3_vitl16", source="local", **kwargs)
+        return model
     return model
