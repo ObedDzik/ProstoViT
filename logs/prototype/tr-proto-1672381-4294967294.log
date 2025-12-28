@@ -1,0 +1,1790 @@
+/project/6106383/obed/medproj/ProstoViT/prostenv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/project/6106383/obed/medproj/ProstoViT/prostenv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+wandb: Currently logged in as: okdzikunu (dziks) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: WARNING Changes to your `wandb` environment variables will be ignored because your `wandb` session has already started. For more information on how to modify your settings with `wandb.init()` arguments, please refer to https://wandb.me/wandb-init.
+wandb: Tracking run with wandb version 0.21.2
+wandb: Run data is saved locally in /project/6106383/obed/medproj/ProstoViT/wandb/run-20251226_204844-wve3lnyc
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run ProstateProtoViT_moreepochs_fold0
+wandb: ⭐️ View project at https://wandb.ai/dziks/prostate_prototypes
+wandb: 🚀 View run at https://wandb.ai/dziks/prostate_prototypes/runs/wve3lnyc
+0
+Indexing frames:   0%|          | 0/23474 [00:00<?, ?it/s]Indexing frames:   1%|          | 229/23474 [00:00<00:10, 2269.05it/s]Indexing frames:   2%|▏         | 456/23474 [00:00<00:10, 2233.28it/s]Indexing frames:   3%|▎         | 680/23474 [00:00<00:10, 2106.77it/s]Indexing frames:   4%|▍         | 1003/23474 [00:00<00:08, 2520.04it/s]Indexing frames:   6%|▌         | 1298/23474 [00:00<00:08, 2669.48it/s]Indexing frames:   7%|▋         | 1567/23474 [00:00<00:09, 2320.46it/s]Indexing frames:   8%|▊         | 1807/23474 [00:00<00:10, 2121.91it/s]Indexing frames:   9%|▊         | 2052/23474 [00:00<00:09, 2210.23it/s]Indexing frames:  10%|█         | 2383/23474 [00:01<00:08, 2517.81it/s]Indexing frames:  11%|█▏        | 2643/23474 [00:01<00:08, 2506.73it/s]Indexing frames:  12%|█▏        | 2899/23474 [00:01<00:08, 2374.18it/s]Indexing frames:  13%|█▎        | 3141/23474 [00:01<00:08, 2283.39it/s]Indexing frames:  14%|█▍        | 3373/23474 [00:01<00:09, 2210.43it/s]Indexing frames:  15%|█▌        | 3597/23474 [00:01<00:09, 2138.02it/s]Indexing frames:  17%|█▋        | 3876/23474 [00:01<00:08, 2316.81it/s]Indexing frames:  18%|█▊        | 4141/23474 [00:01<00:08, 2410.39it/s]Indexing frames:  19%|█▊        | 4385/23474 [00:01<00:08, 2151.50it/s]Indexing frames:  20%|██        | 4719/23474 [00:02<00:07, 2460.40it/s]Indexing frames:  21%|██        | 4974/23474 [00:02<00:08, 2264.57it/s]Indexing frames:  22%|██▏       | 5209/23474 [00:02<00:08, 2205.44it/s]Indexing frames:  23%|██▎       | 5435/23474 [00:02<00:08, 2013.93it/s]Indexing frames:  24%|██▍       | 5643/23474 [00:02<00:09, 1823.70it/s]Indexing frames:  25%|██▍       | 5832/23474 [00:02<00:10, 1701.14it/s]Indexing frames:  26%|██▌       | 6033/23474 [00:02<00:09, 1775.97it/s]Indexing frames:  26%|██▋       | 6216/23474 [00:02<00:10, 1721.11it/s]Indexing frames:  27%|██▋       | 6392/23474 [00:02<00:09, 1723.38it/s]Indexing frames:  28%|██▊       | 6567/23474 [00:03<00:09, 1712.84it/s]Indexing frames:  29%|██▉       | 6821/23474 [00:03<00:08, 1942.75it/s]Indexing frames:  30%|███       | 7129/23474 [00:03<00:07, 2263.24it/s]Indexing frames:  31%|███▏      | 7359/23474 [00:03<00:07, 2213.35it/s]Indexing frames:  32%|███▏      | 7583/23474 [00:03<00:07, 2146.16it/s]Indexing frames:  34%|███▍      | 8000/23474 [00:03<00:05, 2716.05it/s]Indexing frames:  35%|███▌      | 8277/23474 [00:03<00:05, 2622.32it/s]Indexing frames:  36%|███▋      | 8543/23474 [00:03<00:05, 2564.52it/s]Indexing frames:  38%|███▊      | 8803/23474 [00:03<00:05, 2502.67it/s]Indexing frames:  39%|███▉      | 9228/23474 [00:04<00:04, 2994.58it/s]Indexing frames:  41%|████▏     | 9702/23474 [00:04<00:03, 3493.52it/s]Indexing frames:  43%|████▎     | 10057/23474 [00:04<00:03, 3462.31it/s]Indexing frames:  44%|████▍     | 10407/23474 [00:04<00:04, 3064.86it/s]Indexing frames:  46%|████▌     | 10724/23474 [00:04<00:04, 2919.61it/s]Indexing frames:  47%|████▋     | 11110/23474 [00:04<00:03, 3164.96it/s]Indexing frames:  49%|████▊     | 11436/23474 [00:04<00:04, 2939.33it/s]Indexing frames:  50%|█████     | 11739/23474 [00:04<00:04, 2750.99it/s]Indexing frames:  51%|█████▏    | 12077/23474 [00:05<00:05, 2097.16it/s]Indexing frames:  52%|█████▏    | 12315/23474 [00:05<00:05, 2134.60it/s]Indexing frames:  53%|█████▎    | 12550/23474 [00:05<00:05, 2060.70it/s]Indexing frames:  54%|█████▍    | 12771/23474 [00:05<00:05, 1965.73it/s]Indexing frames:  55%|█████▌    | 12977/23474 [00:05<00:05, 1896.10it/s]Indexing frames:  56%|█████▋    | 13254/23474 [00:05<00:04, 2105.60it/s]Indexing frames:  58%|█████▊    | 13620/23474 [00:05<00:03, 2507.83it/s]Indexing frames:  59%|█████▉    | 13883/23474 [00:05<00:04, 2277.09it/s]Indexing frames:  60%|██████    | 14123/23474 [00:06<00:04, 2184.75it/s]Indexing frames:  61%|██████    | 14350/23474 [00:06<00:04, 2108.78it/s]Indexing frames:  62%|██████▏   | 14567/23474 [00:06<00:04, 1980.60it/s]Indexing frames:  63%|██████▎   | 14770/23474 [00:06<00:04, 1832.42it/s]Indexing frames:  64%|██████▍   | 15126/23474 [00:06<00:03, 2267.94it/s]Indexing frames:  65%|██████▌   | 15364/23474 [00:06<00:03, 2172.34it/s]Indexing frames:  66%|██████▋   | 15589/23474 [00:06<00:03, 2050.64it/s]Indexing frames:  68%|██████▊   | 15995/23474 [00:06<00:02, 2573.98it/s]Indexing frames:  69%|██████▉   | 16265/23474 [00:07<00:03, 2279.37it/s]Indexing frames:  70%|███████   | 16507/23474 [00:07<00:03, 2155.18it/s]Indexing frames:  71%|███████▏  | 16733/23474 [00:07<00:03, 2020.14it/s]Indexing frames:  72%|███████▏  | 16943/23474 [00:07<00:03, 2013.63it/s]Indexing frames:  73%|███████▎  | 17150/23474 [00:07<00:03, 1962.86it/s]Indexing frames:  75%|███████▍  | 17574/23474 [00:07<00:02, 2564.19it/s]Indexing frames:  76%|███████▌  | 17841/23474 [00:07<00:02, 2370.12it/s]Indexing frames:  77%|███████▋  | 18088/23474 [00:07<00:02, 2265.97it/s]Indexing frames:  78%|███████▊  | 18322/23474 [00:08<00:02, 2206.05it/s]Indexing frames:  79%|███████▉  | 18547/23474 [00:08<00:02, 2040.76it/s]Indexing frames:  80%|███████▉  | 18756/23474 [00:08<00:02, 1906.05it/s]Indexing frames:  81%|████████  | 18951/23474 [00:08<00:02, 1857.09it/s]Indexing frames:  82%|████████▏ | 19139/23474 [00:08<00:02, 1784.96it/s]Indexing frames:  82%|████████▏ | 19319/23474 [00:08<00:02, 1708.79it/s]Indexing frames:  83%|████████▎ | 19491/23474 [00:08<00:02, 1645.34it/s]Indexing frames:  84%|████████▍ | 19813/23474 [00:08<00:01, 2063.23it/s]Indexing frames:  85%|████████▌ | 20025/23474 [00:08<00:01, 2067.14it/s]Indexing frames:  86%|████████▋ | 20301/23474 [00:09<00:01, 2261.61it/s]Indexing frames:  87%|████████▋ | 20532/23474 [00:09<00:01, 2136.90it/s]Indexing frames:  89%|████████▊ | 20822/23474 [00:09<00:01, 2347.97it/s]Indexing frames:  90%|████████▉ | 21062/23474 [00:09<00:01, 2220.55it/s]Indexing frames:  91%|█████████ | 21289/23474 [00:09<00:01, 2119.74it/s]Indexing frames:  92%|█████████▏| 21550/23474 [00:09<00:00, 2252.94it/s]Indexing frames:  93%|█████████▎| 21779/23474 [00:09<00:00, 2238.78it/s]Indexing frames:  94%|█████████▍| 22093/23474 [00:09<00:00, 2494.15it/s]Indexing frames:  96%|█████████▌| 22513/23474 [00:09<00:00, 2984.10it/s]Indexing frames:  98%|█████████▊| 22888/23474 [00:10<00:00, 3204.43it/s]Indexing frames:  99%|█████████▉| 23212/23474 [00:10<00:00, 2580.12it/s]Indexing frames: 100%|██████████| 23474/23474 [00:10<00:00, 2274.46it/s]
+Indexing frames:   0%|          | 0/23474 [00:00<?, ?it/s]Indexing frames:   4%|▎         | 878/23474 [00:00<00:02, 8688.78it/s]Indexing frames:   7%|▋         | 1747/23474 [00:00<00:02, 7536.80it/s]Indexing frames:  11%|█         | 2511/23474 [00:00<00:02, 7049.12it/s]Indexing frames:  14%|█▎        | 3222/23474 [00:00<00:03, 6503.77it/s]Indexing frames:  17%|█▋        | 3878/23474 [00:00<00:03, 6459.91it/s]Indexing frames:  19%|█▉        | 4527/23474 [00:00<00:03, 5847.04it/s]Indexing frames:  24%|██▍       | 5709/23474 [00:00<00:02, 7561.04it/s]Indexing frames:  29%|██▉       | 6780/23474 [00:00<00:01, 8472.15it/s]Indexing frames:  33%|███▎      | 7656/23474 [00:01<00:01, 8257.08it/s]Indexing frames:  38%|███▊      | 8837/23474 [00:01<00:01, 9276.64it/s]Indexing frames:  42%|████▏     | 9786/23474 [00:01<00:01, 7470.80it/s]Indexing frames:  45%|████▌     | 10649/23474 [00:01<00:01, 7759.51it/s]Indexing frames:  49%|████▉     | 11479/23474 [00:01<00:01, 7028.42it/s]Indexing frames:  52%|█████▏    | 12228/23474 [00:01<00:01, 6912.88it/s]Indexing frames:  56%|█████▌    | 13113/23474 [00:01<00:01, 7405.84it/s]Indexing frames:  59%|█████▉    | 13884/23474 [00:01<00:01, 6698.28it/s]Indexing frames:  64%|██████▎   | 14912/23474 [00:02<00:01, 7609.11it/s]Indexing frames:  67%|██████▋   | 15710/23474 [00:02<00:01, 6901.44it/s]Indexing frames:  70%|███████   | 16435/23474 [00:02<00:01, 6947.23it/s]Indexing frames:  74%|███████▍  | 17355/23474 [00:02<00:00, 7539.22it/s]Indexing frames:  77%|███████▋  | 18135/23474 [00:02<00:00, 6759.79it/s]Indexing frames:  83%|████████▎ | 19485/23474 [00:02<00:00, 8482.82it/s]Indexing frames:  87%|████████▋ | 20381/23474 [00:02<00:00, 7039.93it/s]Indexing frames:  90%|█████████ | 21155/23474 [00:02<00:00, 7024.48it/s]Indexing frames:  93%|█████████▎| 21907/23474 [00:03<00:00, 6943.24it/s]Indexing frames:  96%|█████████▋| 22635/23474 [00:03<00:00, 5226.24it/s]Indexing frames:  99%|█████████▉| 23238/23474 [00:03<00:00, 5320.17it/s]Indexing frames: 100%|██████████| 23474/23474 [00:03<00:00, 6970.63it/s]
+Indexing frames:   0%|          | 0/23474 [00:00<?, ?it/s]Indexing frames:   1%|▏         | 332/23474 [00:00<00:06, 3311.00it/s]Indexing frames:   3%|▎         | 666/23474 [00:00<00:06, 3324.38it/s]Indexing frames:   5%|▍         | 1081/23474 [00:00<00:06, 3698.81it/s]Indexing frames:   6%|▋         | 1497/23474 [00:00<00:05, 3878.82it/s]Indexing frames:   8%|▊         | 1885/23474 [00:00<00:05, 3647.01it/s]Indexing frames:  10%|█         | 2387/23474 [00:00<00:05, 4093.37it/s]Indexing frames:  12%|█▏        | 2828/23474 [00:00<00:04, 4192.92it/s]Indexing frames:  14%|█▍        | 3250/23474 [00:00<00:05, 3905.88it/s]Indexing frames:  16%|█▌        | 3646/23474 [00:00<00:05, 3705.01it/s]Indexing frames:  18%|█▊        | 4149/23474 [00:01<00:04, 4076.50it/s]Indexing frames:  20%|█▉        | 4610/23474 [00:01<00:04, 4227.40it/s]Indexing frames:  21%|██▏       | 5039/23474 [00:01<00:04, 3931.60it/s]Indexing frames:  23%|██▎       | 5440/23474 [00:01<00:04, 3695.72it/s]Indexing frames:  25%|██▍       | 5817/23474 [00:01<00:05, 3524.69it/s]Indexing frames:  26%|██▋       | 6175/23474 [00:01<00:08, 2086.38it/s]Indexing frames:  28%|██▊       | 6492/23474 [00:01<00:07, 2286.05it/s]Indexing frames:  30%|██▉       | 6998/23474 [00:02<00:05, 2863.97it/s]Indexing frames:  31%|███▏      | 7354/23474 [00:02<00:05, 2998.20it/s]Indexing frames:  34%|███▎      | 7883/23474 [00:02<00:04, 3558.33it/s]Indexing frames:  35%|███▌      | 8288/23474 [00:02<00:04, 3508.72it/s]Indexing frames:  37%|███▋      | 8673/23474 [00:02<00:04, 3474.31it/s]Indexing frames:  39%|███▉      | 9147/23474 [00:02<00:03, 3807.13it/s]Indexing frames:  41%|████▏     | 9739/23474 [00:02<00:03, 4383.45it/s]Indexing frames:  43%|████▎     | 10198/23474 [00:02<00:03, 4352.86it/s]Indexing frames:  45%|████▌     | 10648/23474 [00:02<00:03, 3947.09it/s]Indexing frames:  48%|████▊     | 11183/23474 [00:03<00:02, 4318.56it/s]Indexing frames:  50%|████▉     | 11631/23474 [00:03<00:02, 3994.23it/s]Indexing frames:  52%|█████▏    | 12098/23474 [00:03<00:02, 4172.11it/s]Indexing frames:  53%|█████▎    | 12528/23474 [00:03<00:02, 3884.45it/s]Indexing frames:  55%|█████▌    | 12928/23474 [00:03<00:02, 3667.49it/s]Indexing frames:  58%|█████▊    | 13528/23474 [00:03<00:02, 4278.07it/s]Indexing frames:  60%|█████▉    | 13971/23474 [00:03<00:02, 3949.71it/s]Indexing frames:  61%|██████▏   | 14380/23474 [00:03<00:02, 3769.73it/s]Indexing frames:  63%|██████▎   | 14767/23474 [00:04<00:02, 3636.62it/s]Indexing frames:  65%|██████▍   | 15258/23474 [00:04<00:02, 3971.88it/s]Indexing frames:  67%|██████▋   | 15665/23474 [00:04<00:01, 3910.59it/s]Indexing frames:  69%|██████▊   | 16131/23474 [00:04<00:01, 4114.92it/s]Indexing frames:  70%|███████   | 16549/23474 [00:04<00:01, 3859.21it/s]Indexing frames:  72%|███████▏  | 16942/23474 [00:04<00:01, 3617.22it/s]Indexing frames:  74%|███████▎  | 17311/23474 [00:04<00:01, 3611.23it/s]Indexing frames:  76%|███████▌  | 17828/23474 [00:04<00:01, 4038.35it/s]Indexing frames:  78%|███████▊  | 18239/23474 [00:04<00:01, 3809.80it/s]Indexing frames:  79%|███████▉  | 18627/23474 [00:05<00:01, 3626.49it/s]Indexing frames:  81%|████████  | 18996/23474 [00:05<00:01, 3419.26it/s]Indexing frames:  82%|████████▏ | 19343/23474 [00:05<00:01, 3364.03it/s]Indexing frames:  84%|████████▍ | 19813/23474 [00:05<00:00, 3726.40it/s]Indexing frames:  86%|████████▋ | 20259/23474 [00:05<00:00, 3928.79it/s]Indexing frames:  88%|████████▊ | 20658/23474 [00:05<00:00, 3757.25it/s]Indexing frames:  90%|████████▉ | 21083/23474 [00:05<00:00, 3894.18it/s]Indexing frames:  91%|█████████▏| 21477/23474 [00:05<00:00, 3779.32it/s]Indexing frames:  93%|█████████▎| 21898/23474 [00:05<00:00, 3899.43it/s]Indexing frames:  96%|█████████▌| 22554/23474 [00:06<00:00, 4662.77it/s]Indexing frames:  98%|█████████▊| 23053/23474 [00:06<00:00, 4757.75it/s]Indexing frames: 100%|██████████| 23474/23474 [00:06<00:00, 3757.23it/s]
+Indexing frames:   0%|          | 0/23474 [00:00<?, ?it/s]Indexing frames:   4%|▍         | 932/23474 [00:00<00:02, 9301.18it/s]Indexing frames:   8%|▊         | 1957/23474 [00:00<00:02, 9858.30it/s]Indexing frames:  13%|█▎        | 2943/23474 [00:00<00:02, 8469.11it/s]Indexing frames:  16%|█▋        | 3864/23474 [00:00<00:02, 8731.44it/s]Indexing frames:  20%|██        | 4752/23474 [00:00<00:02, 7562.98it/s]Indexing frames:  26%|██▌       | 6099/23474 [00:00<00:01, 9299.49it/s]Indexing frames:  30%|███       | 7075/23474 [00:00<00:01, 8829.99it/s]Indexing frames:  36%|███▌      | 8437/23474 [00:00<00:01, 10186.31it/s]Indexing frames:  40%|████      | 9495/23474 [00:01<00:01, 8849.30it/s] Indexing frames:  44%|████▍     | 10433/23474 [00:01<00:01, 8695.29it/s]Indexing frames:  48%|████▊     | 11338/23474 [00:01<00:01, 8062.33it/s]Indexing frames:  52%|█████▏    | 12173/23474 [00:01<00:01, 8074.16it/s]Indexing frames:  56%|█████▌    | 13143/23474 [00:01<00:01, 8505.85it/s]Indexing frames:  60%|█████▉    | 14014/23474 [00:01<00:01, 8079.25it/s]Indexing frames:  64%|██████▍   | 14970/23474 [00:01<00:01, 8477.33it/s]Indexing frames:  67%|██████▋   | 15833/23474 [00:01<00:00, 7747.17it/s]Indexing frames:  73%|███████▎  | 17192/23474 [00:01<00:00, 9302.82it/s]Indexing frames:  77%|███████▋  | 18157/23474 [00:02<00:00, 8516.19it/s]Indexing frames:  83%|████████▎ | 19494/23474 [00:02<00:00, 9785.99it/s]Indexing frames:  87%|████████▋ | 20514/23474 [00:02<00:00, 8766.37it/s]Indexing frames:  91%|█████████▏| 21443/23474 [00:02<00:00, 8895.89it/s]Indexing frames:  95%|█████████▌| 22367/23474 [00:02<00:00, 7116.53it/s]Indexing frames:  99%|█████████▊| 23154/23474 [00:02<00:00, 7208.24it/s]Indexing frames: 100%|██████████| 23474/23474 [00:02<00:00, 8431.13it/s]
+training set size: 18420
+push set size: 18420
+val set size: 4408
+batch size: 128
+https://dl.fbaipublicfiles.com/deit/deit_small_patch16_224-cd65a155.pth
+cuda
+start training
+Initial weight coefs: {'crs_ent': 1, 'clst': -0.8, 'sep': 0.1, 'l1': 0.01, 'orth': 0.001, 'coh': 0.003}
+============================================================
+STAGE 1 & 2: WARM-UP AND JOINT TRAINING
+============================================================
+epoch: 	0
+	warm
+	train
+/project/6106383/obed/medproj/ProstoViT/model.py:207: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_row = torch.tensor(center_row+self.radius - small_size // 2)
+/project/6106383/obed/medproj/ProstoViT/model.py:208: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_col = torch.tensor(center_col+self.radius - small_size // 2)
+	time: 	92.28s
+	total loss: 	3.8608
+	cross ent: 	1.4607
+	cluster: 	0.0908
+	separation:	0.0961
+	avg separation:	0.0017
+	orthogonal loss:	1462.2208
+	coherence loss:	0.2866
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	47.96%
+	p dist pair: 	291.2850
+	test
+	time: 	25.71s
+	cross ent: 	1.7118
+	cluster: 	0.1250
+	separation:	0.1493
+	avg separation:	0.0016
+	orthogonal loss:	1424.2061
+	coherence loss:	0.3063
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.89%
+	p dist pair: 	291.2850
+*** New best model saved with accuracy: 0.37% at epoch 0 ***
+epoch: 	1
+	warm
+	train
+	time: 	85.83s
+	total loss: 	3.5774
+	cross ent: 	1.3279
+	cluster: 	0.1920
+	separation:	0.2030
+	avg separation:	0.0025
+	orthogonal loss:	1381.8351
+	coherence loss:	0.3286
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	50.15%
+	p dist pair: 	337.7983
+	test
+	time: 	25.15s
+	cross ent: 	1.6560
+	cluster: 	0.2526
+	separation:	0.3063
+	avg separation:	0.0025
+	orthogonal loss:	1338.7803
+	coherence loss:	0.3515
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.82%
+	p dist pair: 	337.7983
+epoch: 	2
+	warm
+	train
+	time: 	85.26s
+	total loss: 	3.3660
+	cross ent: 	1.2953
+	cluster: 	0.3186
+	separation:	0.3347
+	avg separation:	0.0033
+	orthogonal loss:	1290.9476
+	coherence loss:	0.3773
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	51.06%
+	p dist pair: 	391.0067
+	test
+	time: 	23.47s
+	cross ent: 	1.6122
+	cluster: 	0.3707
+	separation:	0.4402
+	avg separation:	0.0034
+	orthogonal loss:	1242.9102
+	coherence loss:	0.4033
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	37.05%
+	p dist pair: 	391.0067
+*** New best model saved with accuracy: 0.37% at epoch 2 ***
+epoch: 	3
+	warm
+	train
+	time: 	84.54s
+	total loss: 	3.1672
+	cross ent: 	1.2721
+	cluster: 	0.4269
+	separation:	0.4450
+	avg separation:	0.0041
+	orthogonal loss:	1190.9040
+	coherence loss:	0.4316
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	51.72%
+	p dist pair: 	449.5493
+	test
+	time: 	25.02s
+	cross ent: 	1.5931
+	cluster: 	0.4696
+	separation:	0.5460
+	avg separation:	0.0042
+	orthogonal loss:	1139.4635
+	coherence loss:	0.4594
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	37.57%
+	p dist pair: 	449.5493
+*** New best model saved with accuracy: 0.38% at epoch 3 ***
+epoch: 	4
+	warm
+	train
+	time: 	83.81s
+	total loss: 	2.9844
+	cross ent: 	1.2550
+	cluster: 	0.5131
+	separation:	0.5323
+	avg separation:	0.0049
+	orthogonal loss:	1085.2055
+	coherence loss:	0.4890
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	52.03%
+	p dist pair: 	511.7253
+	test
+	time: 	24.23s
+	cross ent: 	1.5720
+	cluster: 	0.5485
+	separation:	0.6241
+	avg separation:	0.0049
+	orthogonal loss:	1032.5034
+	coherence loss:	0.5175
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	38.25%
+	p dist pair: 	511.7253
+*** New best model saved with accuracy: 0.38% at epoch 4 ***
+epoch: 	5
+	warm
+	train
+	time: 	84.57s
+	total loss: 	2.8156
+	cross ent: 	1.2396
+	cluster: 	0.5793
+	separation:	0.5971
+	avg separation:	0.0055
+	orthogonal loss:	978.0891
+	coherence loss:	0.5471
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	52.80%
+	p dist pair: 	575.5892
+	test
+	time: 	23.42s
+	cross ent: 	1.5597
+	cluster: 	0.6106
+	separation:	0.6788
+	avg separation:	0.0056
+	orthogonal loss:	926.0721
+	coherence loss:	0.5750
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	39.02%
+	p dist pair: 	575.5892
+*** New best model saved with accuracy: 0.39% at epoch 5 ***
+epoch: 	6
+	warm
+	train
+	time: 	83.94s
+	total loss: 	2.6640
+	cross ent: 	1.2273
+	cluster: 	0.6287
+	separation:	0.6446
+	avg separation:	0.0061
+	orthogonal loss:	873.3921
+	coherence loss:	0.6035
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	52.95%
+	p dist pair: 	639.5429
+	test
+	time: 	23.58s
+	cross ent: 	1.5436
+	cluster: 	0.6597
+	separation:	0.7179
+	avg separation:	0.0062
+	orthogonal loss:	823.8086
+	coherence loss:	0.6299
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	39.75%
+	p dist pair: 	639.5429
+*** New best model saved with accuracy: 0.40% at epoch 6 ***
+epoch: 	7
+	warm
+	train
+	time: 	85.21s
+	total loss: 	2.5240
+	cross ent: 	1.2131
+	cluster: 	0.6669
+	separation:	0.6803
+	avg separation:	0.0067
+	orthogonal loss:	774.3272
+	coherence loss:	0.6565
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	53.49%
+	p dist pair: 	701.9689
+	test
+	time: 	25.17s
+	cross ent: 	1.5364
+	cluster: 	0.6995
+	separation:	0.7471
+	avg separation:	0.0067
+	orthogonal loss:	728.2122
+	coherence loss:	0.6810
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	40.00%
+	p dist pair: 	701.9689
+*** New best model saved with accuracy: 0.40% at epoch 7 ***
+epoch: 	8
+	warm
+	train
+	time: 	84.92s
+	total loss: 	2.4036
+	cross ent: 	1.2061
+	cluster: 	0.6976
+	separation:	0.7086
+	avg separation:	0.0071
+	orthogonal loss:	682.6171
+	coherence loss:	0.7054
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	53.99%
+	p dist pair: 	761.5882
+	test
+	time: 	23.12s
+	cross ent: 	1.5458
+	cluster: 	0.7322
+	separation:	0.7699
+	avg separation:	0.0072
+	orthogonal loss:	640.7795
+	coherence loss:	0.7276
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	40.40%
+	p dist pair: 	761.5882
+*** New best model saved with accuracy: 0.40% at epoch 8 ***
+epoch: 	9
+	warm
+	train
+	time: 	84.54s
+	total loss: 	2.2925
+	cross ent: 	1.1959
+	cluster: 	0.7230
+	separation:	0.7320
+	avg separation:	0.0075
+	orthogonal loss:	599.4626
+	coherence loss:	0.7497
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	54.22%
+	p dist pair: 	817.4832
+	test
+	time: 	23.18s
+	cross ent: 	1.5351
+	cluster: 	0.7587
+	separation:	0.7877
+	avg separation:	0.0076
+	orthogonal loss:	562.1084
+	coherence loss:	0.7694
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	41.20%
+	p dist pair: 	817.4832
+*** New best model saved with accuracy: 0.41% at epoch 9 ***
+epoch: 	10
+	joint
+	train
+	time: 	86.44s
+	total loss: 	2.3926
+	cross ent: 	1.4248
+	cluster: 	0.7805
+	separation:	0.7790
+	avg separation:	0.0043
+	orthogonal loss:	511.9680
+	coherence loss:	0.7967
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	51.56%
+	p dist pair: 	860.9878
+	test
+	time: 	23.36s
+	cross ent: 	1.9087
+	cluster: 	0.8887
+	separation:	0.9190
+	avg separation:	0.0048
+	orthogonal loss:	479.2283
+	coherence loss:	0.8147
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.93%
+	p dist pair: 	860.9878
+epoch: 	11
+	joint
+	train
+	time: 	85.09s
+	total loss: 	2.2289
+	cross ent: 	1.3922
+	cluster: 	0.8828
+	separation:	0.8962
+	avg separation:	0.0058
+	orthogonal loss:	450.8866
+	coherence loss:	0.8299
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	51.44%
+	p dist pair: 	890.6986
+	test
+	time: 	24.65s
+	cross ent: 	1.8242
+	cluster: 	0.9386
+	separation:	0.9601
+	avg separation:	0.0067
+	orthogonal loss:	424.1548
+	coherence loss:	0.8443
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.93%
+	p dist pair: 	890.6986
+epoch: 	12
+	joint
+	train
+	time: 	84.19s
+	total loss: 	2.1018
+	cross ent: 	1.3505
+	cluster: 	0.9308
+	separation:	0.9376
+	avg separation:	0.0085
+	orthogonal loss:	399.6485
+	coherence loss:	0.8578
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	50.86%
+	p dist pair: 	919.0497
+	test
+	time: 	24.63s
+	cross ent: 	1.8286
+	cluster: 	0.9577
+	separation:	0.9707
+	avg separation:	0.0125
+	orthogonal loss:	376.9030
+	coherence loss:	0.8700
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.93%
+	p dist pair: 	919.0497
+epoch: 	13
+	joint
+	train
+	time: 	85.03s
+	total loss: 	1.9619
+	cross ent: 	1.2677
+	cluster: 	0.9482
+	separation:	0.9524
+	avg separation:	0.0120
+	orthogonal loss:	354.8248
+	coherence loss:	0.8817
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	52.34%
+	p dist pair: 	943.8392
+	test
+	time: 	24.89s
+	cross ent: 	1.6050
+	cluster: 	0.9685
+	separation:	0.9759
+	avg separation:	0.0155
+	orthogonal loss:	334.6600
+	coherence loss:	0.8920
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.84%
+	p dist pair: 	943.8392
+epoch: 	14
+	joint
+	train
+	time: 	85.41s
+	total loss: 	1.8807
+	cross ent: 	1.2349
+	cluster: 	0.9614
+	separation:	0.9645
+	avg separation:	0.0138
+	orthogonal loss:	315.7613
+	coherence loss:	0.9016
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	52.46%
+	p dist pair: 	964.5232
+	test
+	time: 	23.64s
+	cross ent: 	1.6213
+	cluster: 	0.9746
+	separation:	0.9790
+	avg separation:	0.0159
+	orthogonal loss:	298.5259
+	coherence loss:	0.9100
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	36.96%
+	p dist pair: 	964.5232
+epoch: 	15
+	joint
+	train
+	time: 	85.83s
+	total loss: 	1.7573
+	cross ent: 	1.1369
+	cluster: 	0.9705
+	separation:	0.9722
+	avg separation:	0.0151
+	orthogonal loss:	296.8480
+	coherence loss:	0.9106
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	55.74%
+	p dist pair: 	966.1664
+	test
+	time: 	23.91s
+	cross ent: 	1.4403
+	cluster: 	0.9777
+	separation:	0.9824
+	avg separation:	0.0162
+	orthogonal loss:	295.3109
+	coherence loss:	0.9112
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	45.28%
+	p dist pair: 	966.1664
+*** New best model saved with accuracy: 0.45% at epoch 15 ***
+epoch: 	16
+	joint
+	train
+	time: 	85.92s
+	total loss: 	1.6737
+	cross ent: 	1.0580
+	cluster: 	0.9728
+	separation:	0.9744
+	avg separation:	0.0150
+	orthogonal loss:	293.7593
+	coherence loss:	0.9119
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	60.14%
+	p dist pair: 	967.8289
+	test
+	time: 	23.37s
+	cross ent: 	1.4329
+	cluster: 	0.9781
+	separation:	0.9823
+	avg separation:	0.0163
+	orthogonal loss:	292.2260
+	coherence loss:	0.9125
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	47.05%
+	p dist pair: 	967.8289
+*** New best model saved with accuracy: 0.47% at epoch 16 ***
+epoch: 	17
+	joint
+	train
+	time: 	84.57s
+	total loss: 	1.6357
+	cross ent: 	1.0236
+	cluster: 	0.9735
+	separation:	0.9748
+	avg separation:	0.0150
+	orthogonal loss:	290.6214
+	coherence loss:	0.9131
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	61.41%
+	p dist pair: 	969.5388
+	test
+	time: 	25.33s
+	cross ent: 	1.4260
+	cluster: 	0.9785
+	separation:	0.9824
+	avg separation:	0.0163
+	orthogonal loss:	289.0654
+	coherence loss:	0.9138
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	47.82%
+	p dist pair: 	969.5388
+*** New best model saved with accuracy: 0.48% at epoch 17 ***
+epoch: 	18
+	joint
+	train
+	time: 	84.63s
+	total loss: 	1.6028
+	cross ent: 	0.9941
+	cluster: 	0.9737
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	287.4593
+	coherence loss:	0.9144
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	62.93%
+	p dist pair: 	971.2510
+	test
+	time: 	23.16s
+	cross ent: 	1.4263
+	cluster: 	0.9788
+	separation:	0.9823
+	avg separation:	0.0164
+	orthogonal loss:	285.8874
+	coherence loss:	0.9150
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.68%
+	p dist pair: 	971.2510
+*** New best model saved with accuracy: 0.49% at epoch 18 ***
+epoch: 	19
+	joint
+	train
+	time: 	86.54s
+	total loss: 	1.5757
+	cross ent: 	0.9707
+	cluster: 	0.9743
+	separation:	0.9752
+	avg separation:	0.0151
+	orthogonal loss:	284.2284
+	coherence loss:	0.9157
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	63.96%
+	p dist pair: 	973.0162
+	test
+	time: 	24.16s
+	cross ent: 	1.4305
+	cluster: 	0.9790
+	separation:	0.9823
+	avg separation:	0.0165
+	orthogonal loss:	282.6083
+	coherence loss:	0.9163
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.82%
+	p dist pair: 	973.0162
+*** New best model saved with accuracy: 0.49% at epoch 19 ***
+epoch: 	20
+	joint
+	train
+	time: 	85.35s
+	total loss: 	1.5360
+	cross ent: 	0.9321
+	cluster: 	0.9734
+	separation:	0.9738
+	avg separation:	0.0150
+	orthogonal loss:	282.4283
+	coherence loss:	0.9164
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	65.17%
+	p dist pair: 	973.1933
+	test
+	time: 	23.75s
+	cross ent: 	1.4107
+	cluster: 	0.9795
+	separation:	0.9827
+	avg separation:	0.0166
+	orthogonal loss:	282.2593
+	coherence loss:	0.9164
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.73%
+	p dist pair: 	973.1933
+epoch: 	21
+	joint
+	train
+	time: 	86.35s
+	total loss: 	1.5299
+	cross ent: 	0.9266
+	cluster: 	0.9737
+	separation:	0.9741
+	avg separation:	0.0151
+	orthogonal loss:	282.0837
+	coherence loss:	0.9165
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	65.37%
+	p dist pair: 	973.3743
+	test
+	time: 	23.43s
+	cross ent: 	1.4025
+	cluster: 	0.9797
+	separation:	0.9829
+	avg separation:	0.0166
+	orthogonal loss:	281.9125
+	coherence loss:	0.9166
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.89%
+	p dist pair: 	973.3743
+*** New best model saved with accuracy: 0.49% at epoch 21 ***
+epoch: 	22
+	joint
+	train
+	time: 	85.50s
+	total loss: 	1.5302
+	cross ent: 	0.9274
+	cluster: 	0.9738
+	separation:	0.9742
+	avg separation:	0.0151
+	orthogonal loss:	281.7324
+	coherence loss:	0.9166
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	65.52%
+	p dist pair: 	973.5625
+	test
+	time: 	24.93s
+	cross ent: 	1.3997
+	cluster: 	0.9800
+	separation:	0.9832
+	avg separation:	0.0165
+	orthogonal loss:	281.5571
+	coherence loss:	0.9167
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.77%
+	p dist pair: 	973.5625
+epoch: 	23
+	joint
+	train
+	time: 	84.79s
+	total loss: 	1.5246
+	cross ent: 	0.9224
+	cluster: 	0.9742
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	281.3720
+	coherence loss:	0.9168
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	65.81%
+	p dist pair: 	973.7562
+	test
+	time: 	24.86s
+	cross ent: 	1.3999
+	cluster: 	0.9801
+	separation:	0.9833
+	avg separation:	0.0166
+	orthogonal loss:	281.1923
+	coherence loss:	0.9168
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.77%
+	p dist pair: 	973.7562
+epoch: 	24
+	joint
+	train
+	time: 	85.50s
+	total loss: 	1.5148
+	cross ent: 	0.9129
+	cluster: 	0.9741
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	281.0058
+	coherence loss:	0.9169
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.23%
+	p dist pair: 	973.9546
+	test
+	time: 	23.54s
+	cross ent: 	1.4017
+	cluster: 	0.9802
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.8241
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.89%
+	p dist pair: 	973.9546
+epoch: 	25
+	joint
+	train
+	time: 	85.80s
+	total loss: 	1.5115
+	cross ent: 	0.9101
+	cluster: 	0.9746
+	separation:	0.9749
+	avg separation:	0.0151
+	orthogonal loss:	280.8040
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.46%
+	p dist pair: 	973.9599
+	test
+	time: 	24.75s
+	cross ent: 	1.4018
+	cluster: 	0.9802
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.7852
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.93%
+	p dist pair: 	973.9599
+*** New best model saved with accuracy: 0.49% at epoch 25 ***
+epoch: 	26
+	joint
+	train
+	time: 	85.52s
+	total loss: 	1.5119
+	cross ent: 	0.9104
+	cluster: 	0.9743
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.7658
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.72%
+	p dist pair: 	973.9651
+	test
+	time: 	23.10s
+	cross ent: 	1.4021
+	cluster: 	0.9802
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.7469
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.96%
+	p dist pair: 	973.9651
+*** New best model saved with accuracy: 0.49% at epoch 26 ***
+epoch: 	27
+	joint
+	train
+	time: 	84.21s
+	total loss: 	1.5088
+	cross ent: 	0.9071
+	cluster: 	0.9740
+	separation:	0.9743
+	avg separation:	0.0151
+	orthogonal loss:	280.7273
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.64%
+	p dist pair: 	973.9707
+	test
+	time: 	24.37s
+	cross ent: 	1.4030
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.7081
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	48.98%
+	p dist pair: 	973.9707
+*** New best model saved with accuracy: 0.49% at epoch 27 ***
+epoch: 	28
+	joint
+	train
+	time: 	85.37s
+	total loss: 	1.5122
+	cross ent: 	0.9106
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6881
+	coherence loss:	0.9170
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.31%
+	p dist pair: 	973.9766
+	test
+	time: 	23.01s
+	cross ent: 	1.4032
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6685
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.09%
+	p dist pair: 	973.9766
+*** New best model saved with accuracy: 0.49% at epoch 28 ***
+epoch: 	29
+	joint
+	train
+	time: 	85.11s
+	total loss: 	1.5096
+	cross ent: 	0.9082
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6483
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.75%
+	p dist pair: 	973.9828
+	test
+	time: 	27.08s
+	cross ent: 	1.4033
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6287
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9828
+*** New best model saved with accuracy: 0.49% at epoch 29 ***
+epoch: 	30
+	joint
+	train
+	time: 	85.74s
+	total loss: 	1.5148
+	cross ent: 	0.9134
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6265
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.47%
+	p dist pair: 	973.9859
+	test
+	time: 	25.04s
+	cross ent: 	1.4034
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6245
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9859
+epoch: 	31
+	joint
+	train
+	time: 	84.12s
+	total loss: 	1.5102
+	cross ent: 	0.9089
+	cluster: 	0.9745
+	separation:	0.9748
+	avg separation:	0.0151
+	orthogonal loss:	280.6224
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.74%
+	p dist pair: 	973.9888
+	test
+	time: 	23.98s
+	cross ent: 	1.4035
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6203
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.09%
+	p dist pair: 	973.9888
+epoch: 	32
+	joint
+	train
+	time: 	85.67s
+	total loss: 	1.5111
+	cross ent: 	0.9097
+	cluster: 	0.9742
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6182
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.87%
+	p dist pair: 	973.9919
+	test
+	time: 	24.98s
+	cross ent: 	1.4035
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6161
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.09%
+	p dist pair: 	973.9919
+epoch: 	33
+	joint
+	train
+	time: 	84.83s
+	total loss: 	1.5086
+	cross ent: 	0.9073
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6140
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.39%
+	p dist pair: 	973.9950
+	test
+	time: 	24.56s
+	cross ent: 	1.4034
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6120
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9950
+epoch: 	34
+	joint
+	train
+	time: 	85.14s
+	total loss: 	1.5108
+	cross ent: 	0.9094
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0150
+	orthogonal loss:	280.6098
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.63%
+	p dist pair: 	973.9981
+	test
+	time: 	25.03s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6078
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.09%
+	p dist pair: 	973.9981
+epoch: 	35
+	joint
+	train
+	time: 	86.00s
+	total loss: 	1.5093
+	cross ent: 	0.9080
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6076
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.67%
+	p dist pair: 	973.9982
+	test
+	time: 	24.18s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6075
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.09%
+	p dist pair: 	973.9982
+epoch: 	36
+	joint
+	train
+	time: 	85.76s
+	total loss: 	1.5097
+	cross ent: 	0.9082
+	cluster: 	0.9741
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6074
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.40%
+	p dist pair: 	973.9984
+	test
+	time: 	24.92s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6073
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9984
+epoch: 	37
+	joint
+	train
+	time: 	86.10s
+	total loss: 	1.5038
+	cross ent: 	0.9025
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6072
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.96%
+	p dist pair: 	973.9985
+	test
+	time: 	23.39s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6071
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9985
+epoch: 	38
+	joint
+	train
+	time: 	85.18s
+	total loss: 	1.5093
+	cross ent: 	0.9079
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6069
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.91%
+	p dist pair: 	973.9987
+	test
+	time: 	26.68s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6068
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.12%
+	p dist pair: 	973.9987
+epoch: 	39
+	joint
+	train
+	time: 	85.61s
+	total loss: 	1.5115
+	cross ent: 	0.9102
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6067
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.60%
+	p dist pair: 	973.9989
+	test
+	time: 	24.29s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+*** New best model saved with accuracy: 0.49% at epoch 39 ***
+epoch: 	40
+	joint
+	train
+	time: 	86.44s
+	total loss: 	1.5136
+	cross ent: 	0.9123
+	cluster: 	0.9743
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.41%
+	p dist pair: 	973.9989
+	test
+	time: 	24.30s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	41
+	joint
+	train
+	time: 	88.03s
+	total loss: 	1.5100
+	cross ent: 	0.9085
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.53%
+	p dist pair: 	973.9989
+	test
+	time: 	23.67s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	42
+	joint
+	train
+	time: 	86.35s
+	total loss: 	1.5109
+	cross ent: 	0.9095
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.64%
+	p dist pair: 	973.9989
+	test
+	time: 	24.46s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	43
+	joint
+	train
+	time: 	87.71s
+	total loss: 	1.5080
+	cross ent: 	0.9067
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.66%
+	p dist pair: 	973.9989
+	test
+	time: 	23.94s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	44
+	joint
+	train
+	time: 	84.81s
+	total loss: 	1.5080
+	cross ent: 	0.9066
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0150
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.91%
+	p dist pair: 	973.9989
+	test
+	time: 	26.34s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	45
+	joint
+	train
+	time: 	87.15s
+	total loss: 	1.5061
+	cross ent: 	0.9047
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.89%
+	p dist pair: 	973.9989
+	test
+	time: 	26.08s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	46
+	joint
+	train
+	time: 	88.11s
+	total loss: 	1.5094
+	cross ent: 	0.9081
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0150
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.70%
+	p dist pair: 	973.9989
+	test
+	time: 	26.64s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	47
+	joint
+	train
+	time: 	86.76s
+	total loss: 	1.5076
+	cross ent: 	0.9063
+	cluster: 	0.9745
+	separation:	0.9748
+	avg separation:	0.0150
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.66%
+	p dist pair: 	973.9989
+	test
+	time: 	25.53s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	48
+	joint
+	train
+	time: 	87.66s
+	total loss: 	1.5078
+	cross ent: 	0.9063
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.37%
+	p dist pair: 	973.9989
+	test
+	time: 	26.36s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+epoch: 	49
+	joint
+	train
+	time: 	85.34s
+	total loss: 	1.5094
+	cross ent: 	0.9081
+	cluster: 	0.9744
+	separation:	0.9747
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.49%
+	p dist pair: 	973.9989
+	test
+	time: 	23.67s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 1.0000, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+============================================================
+Loading best joint model from epoch 39 with accuracy 0.49%
+============================================================
+============================================================
+STAGE 3: SLOTS PRUNING
+============================================================
+Coefs for slots training: {'crs_ent': 1, 'clst': -0.8, 'sep': 0.1, 'l1': 0.01, 'orth': 0.001, 'coh': 1e-06}
+Initial active slots: 200/200 (100.0%)
+	joint
+slots epoch: 	0
+	train
+	time: 	84.72s
+	total loss: 	1.5043
+	cross ent: 	0.9057
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0150
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.77%
+	p dist pair: 	973.9989
+	test
+	time: 	24.28s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+	joint
+slots epoch: 	1
+	train
+	time: 	84.65s
+	total loss: 	1.5087
+	cross ent: 	0.9100
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.51%
+	p dist pair: 	973.9989
+	test
+	time: 	23.84s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+	joint
+slots epoch: 	2
+	train
+	time: 	84.12s
+	total loss: 	1.5093
+	cross ent: 	0.9106
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0150
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.53%
+	p dist pair: 	973.9989
+	test
+	time: 	25.38s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 1.0000, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+	joint
+slots epoch: 	3
+	train
+	time: 	84.72s
+	total loss: 	1.5132
+	cross ent: 	0.9145
+	cluster: 	0.9742
+	separation:	0.9745
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 0.9999, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.29%
+	p dist pair: 	973.9989
+	test
+	time: 	24.33s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 0.9999, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+	joint
+slots epoch: 	4
+	train
+	time: 	84.99s
+	total loss: 	1.5054
+	cross ent: 	0.9068
+	cluster: 	0.9743
+	separation:	0.9746
+	avg separation:	0.0151
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 0.9999, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	66.72%
+	p dist pair: 	973.9989
+	test
+	time: 	25.30s
+	cross ent: 	1.4037
+	cluster: 	0.9803
+	separation:	0.9834
+	avg separation:	0.0165
+	orthogonal loss:	280.6066
+	coherence loss:	0.9171
+	l1: 		150.0000
+	slot of prototype 0: 	tensor([1.0000, 0.9999, 0.9999, 1.0000], device='cuda:0')
+	Estimated avg number of active slots: 	200.00
+	Estimated avg slots value: 	1.0000
+	accuracy: 	49.14%
+	p dist pair: 	973.9989
+============================================================
+Rounding slot indicators to binary values
+============================================================
+Slots before rounding: 200/200 (100.0%)
+Slots after rounding: 200/200 (100.0%)
+Slots pruned: 0
+Slot indicators frozen
+============================================================
+STAGE 4: PROTOTYPE PROJECTION
+============================================================
+	push
+Traceback (most recent call last):
+  File "/home/obed/projects/aip-medilab/obed/medproj/ProstoViT/main_debug.py", line 452, in <module>
+    main(cfg)
+  File "/home/obed/projects/aip-medilab/obed/medproj/ProstoViT/main_debug.py", line 333, in main
+    push_greedy.push_prototypes(
+  File "/project/6106383/obed/medproj/ProstoViT/push_greedy.py", line 294, in push_prototypes
+    for push_iter, (search_batch_input, search_y) in enumerate(dataloader):
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 2)
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mProstateProtoViT_moreepochs_fold0[0m at: [34mhttps://wandb.ai/dziks/prostate_prototypes/runs/wve3lnyc[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20251226_204844-wve3lnyc/logs[0m
+srun: error: kn033: task 0: Exited with exit code 1

@@ -1,0 +1,11 @@
+{"time":"2025-12-26T20:48:45.301467192-05:00","level":"INFO","msg":"stream: starting","core version":"0.21.2"}
+{"time":"2025-12-26T20:48:45.529204983-05:00","level":"INFO","msg":"stream: created new stream","id":"wve3lnyc"}
+{"time":"2025-12-26T20:48:45.529272262-05:00","level":"INFO","msg":"stream: started","id":"wve3lnyc"}
+{"time":"2025-12-26T20:48:45.529300437-05:00","level":"INFO","msg":"writer: started","stream_id":"wve3lnyc"}
+{"time":"2025-12-26T20:48:45.529352298-05:00","level":"INFO","msg":"handler: started","stream_id":"wve3lnyc"}
+{"time":"2025-12-26T20:48:45.529308441-05:00","level":"INFO","msg":"sender: started","stream_id":"wve3lnyc"}
+{"time":"2025-12-26T22:30:38.754794917-05:00","level":"INFO","msg":"stream: closing","id":"wve3lnyc"}
+{"time":"2025-12-26T22:30:39.128018333-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-12-26T22:30:39.269603203-05:00","level":"INFO","msg":"handler: closed","stream_id":"wve3lnyc"}
+{"time":"2025-12-26T22:30:39.271052735-05:00","level":"INFO","msg":"sender: closed","stream_id":"wve3lnyc"}
+{"time":"2025-12-26T22:30:39.271085302-05:00","level":"INFO","msg":"stream: closed","id":"wve3lnyc"}

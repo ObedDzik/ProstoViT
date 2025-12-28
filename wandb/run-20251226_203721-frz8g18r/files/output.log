@@ -1,0 +1,22 @@
+Indexing frames: 100%|██████████| 23474/23474 [00:09<00:00, 2356.00it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:03<00:00, 6865.40it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:06<00:00, 3615.15it/s]
+Indexing frames: 100%|██████████| 23474/23474 [00:02<00:00, 8571.57it/s]
+training set size: 18420
+push set size: 18420
+val set size: 4408
+batch size: 128
+https://dl.fbaipublicfiles.com/deit/deit_small_patch16_224-cd65a155.pth
+cuda
+start training
+Initial weight coefs: {'crs_ent': 1, 'clst': -0.8, 'sep': 0.1, 'l1': 0.01, 'orth': 0.001, 'coh': 0.003}
+============================================================
+STAGE 1 & 2: WARM-UP AND JOINT TRAINING
+============================================================
+epoch: 	0
+	warm
+	train
+/project/6106383/obed/medproj/ProstoViT/model.py:207: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_row = torch.tensor(center_row+self.radius - small_size // 2)
+/project/6106383/obed/medproj/ProstoViT/model.py:208: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  start_col = torch.tensor(center_col+self.radius - small_size // 2)

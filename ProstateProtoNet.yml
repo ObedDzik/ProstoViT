@@ -11,11 +11,11 @@ architecture:
   radius: 1 # unit of patches 
   img_size: 224
   deit_small_patch16_224:
-    prototype_shape: [2000, 384, 4]
+    prototype_shape: [50, 384, 4]
   deit_tiny_patch16_224:
-    prototype_shape: [2000, 192, 4]
+    prototype_shape: [50, 192, 4]
   cait_xxs24_224:
-    prototype_shape: [2000, 192, 4]
+    prototype_shape: [50, 192, 4]
 
 train:
   dropout_rate: 0.0
@@ -57,8 +57,8 @@ data:
   cohort_selection_mode: splits_file
   splits_file: "/datasets/exactvu_pca/OPTIMUM/processed/processed/UA_annotated_needles/splits.json"
   dataset: default
-  batch_size: 4
-  num_workers: 8
+  batch_size: 128
+  num_workers: 16
   train_subsample_seed: 42
   augmentations: random_crop
   image_size: ${architecture.img_size}
