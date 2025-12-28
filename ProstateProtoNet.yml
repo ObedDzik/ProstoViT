@@ -1,6 +1,6 @@
 ################### Experiment information ######################
 description: ProstateProtoViT model
-run_name: "ProstateProtoViT_moreepochs"
+run_name: "ProstateProtoViT_dino"
 wandb_mode: 'online'
 abstain_class: True
 base_dir: /home/obed/scratchs
@@ -16,6 +16,9 @@ architecture:
     prototype_shape: [50, 192, 4]
   cait_xxs24_224:
     prototype_shape: [50, 192, 4]
+  dinov3:
+    prototype_shape: [100, 1024, 4]
+
 
 train:
   dropout_rate: 0.0

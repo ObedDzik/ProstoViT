@@ -2,3 +2,5 @@ prostenv
 __pycache__
 rough.ipynb
 tools/__pycache__
+logs
+wandb
