@@ -119,6 +119,7 @@ class PPNet(nn.Module):
         elif self.arc == 'dinov3':
             x = x.reshape(x.size(0), -1, x.size(-1))
             x = torch.cat((cls_token, x), dim=1)
+            x = self.features.pos_drop(x)
             for blk in self.features.blocks:
                 x=blk(x)
             x=self.features.norm(x) # bsz, 197, dim
