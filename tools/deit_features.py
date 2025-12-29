@@ -157,15 +157,13 @@ def deit_small_patch_features(pretrained=False, **kwargs):
 
 @register_model
 def dinov3_patch_features(**kwargs):
-    model = dinov3_vitl16(**kwargs)
-    def dinov3_vitl16(**kwargs):
 
-        REPO_DIR = DINOV3_LIBRARY_PATH
-        weight_basename = "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"
-        weights = os.path.join(DINOV3_CHECKPOINTS_PATH, weight_basename)
-        if not os.path.exists(weights):
-            raise FileNotFoundError(f"DINOv3 checkpoint not found: {weights}")
-        kwargs["weights"] = weights
-        model = torch.hub.load(REPO_DIR, "dinov3_vitl16", source="local", **kwargs)
-        return model
+    REPO_DIR = DINOV3_LIBRARY_PATH
+    weight_basename = "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"
+    weights = os.path.join(DINOV3_CHECKPOINTS_PATH, weight_basename)
+    if not os.path.exists(weights):
+        raise FileNotFoundError(f"DINOv3 checkpoint not found: {weights}")
+    kwargs["weights"] = weights
+    model = torch.hub.load(REPO_DIR, "dinov3_vitl16", source="local", **kwargs)
+    del model.head
     return model

@@ -267,17 +267,31 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     log('\tp dist pair: \t{0:.4f}'.format(p_avg_pair_dist.item()))
 
     # Return loss values as dictionary
-    loss_values = {
-        "cross entropy Loss": total_cross_entropy / n_batches,
-        "clst loss": total_cluster_cost / n_batches,
-        "sep loss": total_separation_cost / n_batches,
-        "avg separation_cost": total_avg_separation_cost / n_batches,
-        "l1 loss": model.last_layer.weight.norm(p=1).item(),
-        "orth loss": total_orth_loss / n_batches,
-        "coherence loss": total_coherence_loss / n_batches,
-        "acc": n_correct / n_examples * 100
-    }
-    
+    if is_train:
+        loss_values = {
+            "cross entropy Loss": coefs['crs_ent'] * total_cross_entropy / n_batches,
+            "clst loss": coefs['clst'] *  total_cluster_cost / n_batches,
+            "sep loss": coefs['sep'] * total_separation_cost / n_batches,
+            "avg separation_cost": total_avg_separation_cost / n_batches,
+            "l1 loss": coefs['l1'] * model.last_layer.weight.norm(p=1).item(),
+            "orth loss": coefs['orth'] *  total_orth_loss / n_batches,
+            "coherence loss": coefs['coh'] * total_coherence_loss / n_batches,
+            "total loss": total_loss/ n_batches,
+            "acc": n_correct / n_examples * 100
+        }
+    else:
+        loss_values = {
+            "cross entropy Loss": total_cross_entropy / n_batches,
+            "clst loss": total_cluster_cost / n_batches,
+            "sep loss": total_separation_cost / n_batches,
+            "avg separation_cost": total_avg_separation_cost / n_batches,
+            "l1 loss": model.last_layer.weight.norm(p=1).item(),
+            "orth loss": total_orth_loss / n_batches,
+            "coherence loss": total_coherence_loss / n_batches,
+            "acc": n_correct / n_examples * 100
+        }
+
+
     return (n_correct / n_examples), loss_values
 
 

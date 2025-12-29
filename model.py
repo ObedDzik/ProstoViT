@@ -31,6 +31,12 @@ class PPNet(nn.Module):
         self.normalizer = nn.Softmax(dim=1)
         # prototype_activation_function could be 'log', 'linear',
         # or a generic function that converts distance to similarity score
+        
+        # Add patch size (both DINOv3 and DeiT use 16)
+        self.patch_size = 16  # DINOv3-ViT-L/16 and DeiT use patch size 16
+        # Compute spatial dimensions
+        self.spatial_size = img_size // self.patch_size  # 48 for 768, 14 for 224
+        self.num_spatial_patches = self.spatial_size ** 2
         self.prototype_activation_function = prototype_activation_function
         '''
         Here we are initializing the class identities of the prototypes
@@ -72,6 +78,8 @@ class PPNet(nn.Module):
             self.arc = 'deit'
         elif features_name.startswith('CAIT'):
             self.arc = 'cait'
+        elif features_name.startswith('DINO'):
+            self.arc = 'dinov3'
         if init_weights:
             self._initialize_weights()
 
@@ -109,9 +117,8 @@ class PPNet(nn.Module):
             x = self.features.norm(x) # bsz, 197, dim
 
         elif self.arc == 'dinov3':
-            x=self.features.patch_embed(x)
             x = x.reshape(x.size(0), -1, x.size(-1))
-            x = torch.cat((self.features.cls_token.expand(x.size(0), -1, -1), x), dim=1)
+            x = torch.cat((cls_token, x), dim=1)
             for blk in self.features.blocks:
                 x=blk(x)
             x=self.features.norm(x) # bsz, 197, dim
@@ -189,50 +196,110 @@ class PPNet(nn.Module):
         #dist_all = dist_all # bsz, 2000, 196, 4
         return conv_feature, dist_all
     
+    # def neigboring_mask(self, center_indices):
+    #     """
+    #     This function add a radius by radius matrix center on the 
+    #     selected top patches to encourage adjacency of the prototypes 
+    #     Input center_indices: max_patch_id shape bsz, 2000, 1
+    #     Some hardcoding is here (lazy)
+    #     return a neighboring mask: bsz 2000 196 
+    #     0: means non-adjacent (not included)
+    #     1: adjacent (included)
+    #     """
+    #     # add padding to the original target size 
+    #     large_padded = (14+self.radius*2)**2 
+    #     large_matrix = torch.zeros(center_indices.shape[0], self.num_prototypes, large_padded).cuda()
+    #     small_total = (2*self.radius + 1)**2
+    #     small_matrix = torch.ones(center_indices.shape[0], self.num_prototypes, small_total).cuda()
+    #     batch_size, num_points, _ = center_indices.shape
+    #     small_size = int(small_matrix.shape[-1]**0.5)
+    #     large_size = int(large_matrix.shape[-1]**0.5)
+    #     # Reshape center_indices for broadcasting, and convert to 2D indices
+    #     # Unfortunately divmod doesn't work on torch 
+    #     #center_row, center_col = divmod(center_indices.squeeze(-1).cpu().numpy(), 14)
+    #     center_row, center_col = center_indices.squeeze(-1)//14, center_indices.squeeze(-1)%14
+    #     # Calculate the top-left corner for the rxr addition
+    #     # relative location in the padded matrix to the original shape 
+    #     start_row = torch.tensor(center_row+self.radius - small_size // 2)
+    #     start_col = torch.tensor(center_col+self.radius - small_size // 2)
+    #     # Handle boundaries (padding might be required if indices go negative)
+    #     start_row = torch.clamp(start_row, 0, large_size - small_size)
+    #     start_col = torch.clamp(start_col, 0, large_size - small_size)
+    #     # Iterate through each possible position in the rxr matrix
+    #     for i in range(small_size):
+    #         for j in range(small_size):
+    #             # Determine the corresponding position in the 14x14 matrix
+    #             large_row = start_row + i
+    #             large_col = start_col + j
+    #             # Convert 2D indices back to 1D indices for both matrices
+    #             large_idx = large_row * large_size + large_col
+    #             small_idx = i * small_size + j
+    #             # Add the small matrix values to the large matrix
+    #             large_matrix.view(batch_size, num_points, -1)[torch.arange(batch_size)[:, None], 
+    #                                                             torch.arange(num_points), large_idx] += small_matrix[..., small_idx]
+    #     large_matrix_reshape = large_matrix.view(batch_size, num_points,large_size,large_size )
+    #     large_matrix_unpad = large_matrix_reshape[:,:, self.radius: -self.radius,  self.radius:-self.radius] # bsz, 2000, 14,14 
+    #     large_matrix_unpad = large_matrix_unpad.reshape(batch_size,num_points,-1) # bdz, 2000, 196
+    #     return large_matrix_unpad
+    
     def neigboring_mask(self, center_indices):
         """
-        This function add a radius by radius matrix center on the 
+        This function adds a radius by radius matrix centered on the 
         selected top patches to encourage adjacency of the prototypes 
-        Input center_indices: max_patch_id shape bsz, 2000, 1
-        Some hardcoding is here (lazy)
-        return a neighboring mask: bsz 2000 196 
+        Input center_indices: max_patch_id shape [bsz, num_prototypes, 1]
+        
+        return a neighboring mask: [bsz, num_prototypes, num_spatial_patches]
         0: means non-adjacent (not included)
         1: adjacent (included)
         """
-        # add padding to the original target size 
-        large_padded = (14+self.radius*2)**2 
-        large_matrix = torch.zeros(center_indices.shape[0], self.num_prototypes, large_padded).cuda()
-        small_total = (2*self.radius + 1)**2
-        small_matrix = torch.ones(center_indices.shape[0], self.num_prototypes, small_total).cuda()
         batch_size, num_points, _ = center_indices.shape
-        small_size = int(small_matrix.shape[-1]**0.5)
-        large_size = int(large_matrix.shape[-1]**0.5)
-        # Reshape center_indices for broadcasting, and convert to 2D indices
-        # Unfortunately divmod doesn't work on torch 
-        #center_row, center_col = divmod(center_indices.squeeze(-1).cpu().numpy(), 14)
-        center_row, center_col = center_indices.squeeze(-1)//14, center_indices.squeeze(-1)%14
+        
+        # Compute spatial dimensions dynamically based on image size
+        spatial_size = self.img_size // self.patch_size  # 48 for 768×768, 14 for 224×224
+        
+        # Add padding to the original target size 
+        large_padded_size = spatial_size + self.radius * 2
+        large_padded = large_padded_size ** 2
+        large_matrix = torch.zeros(batch_size, self.num_prototypes, large_padded).cuda()
+        small_total = (2 * self.radius + 1) ** 2
+        small_matrix = torch.ones(batch_size, self.num_prototypes, small_total).cuda()
+        small_size = int(small_matrix.shape[-1] ** 0.5)
+        large_size = int(large_matrix.shape[-1] ** 0.5)
+        # Convert flat indices to 2D coordinates using dynamic spatial_size
+        center_row = center_indices.squeeze(-1) // spatial_size  # Changed from // 14
+        center_col = center_indices.squeeze(-1) % spatial_size   # Changed from % 14
         # Calculate the top-left corner for the rxr addition
         # relative location in the padded matrix to the original shape 
-        start_row = torch.tensor(center_row+self.radius - small_size // 2)
-        start_col = torch.tensor(center_col+self.radius - small_size // 2)
+        start_row = torch.tensor(center_row + self.radius - small_size // 2)
+        start_col = torch.tensor(center_col + self.radius - small_size // 2)
         # Handle boundaries (padding might be required if indices go negative)
         start_row = torch.clamp(start_row, 0, large_size - small_size)
         start_col = torch.clamp(start_col, 0, large_size - small_size)
         # Iterate through each possible position in the rxr matrix
         for i in range(small_size):
             for j in range(small_size):
-                # Determine the corresponding position in the 14x14 matrix
+                # Determine the corresponding position in the spatial_size × spatial_size matrix
                 large_row = start_row + i
                 large_col = start_col + j
                 # Convert 2D indices back to 1D indices for both matrices
                 large_idx = large_row * large_size + large_col
                 small_idx = i * small_size + j
                 # Add the small matrix values to the large matrix
-                large_matrix.view(batch_size, num_points, -1)[torch.arange(batch_size)[:, None], 
-                                                                torch.arange(num_points), large_idx] += small_matrix[..., small_idx]
-        large_matrix_reshape = large_matrix.view(batch_size, num_points,large_size,large_size )
-        large_matrix_unpad = large_matrix_reshape[:,:, self.radius: -self.radius,  self.radius:-self.radius] # bsz, 2000, 14,14 
-        large_matrix_unpad = large_matrix_unpad.reshape(batch_size,num_points,-1) # bdz, 2000, 196
+                large_matrix.view(batch_size, num_points, -1)[
+                    torch.arange(batch_size)[:, None], 
+                    torch.arange(num_points), 
+                    large_idx
+                ] += small_matrix[..., small_idx]
+        # Reshape and unpad
+        large_matrix_reshape = large_matrix.view(batch_size, num_points, large_size, large_size)
+        large_matrix_unpad = large_matrix_reshape[
+            :, :, 
+            self.radius:-self.radius,  
+            self.radius:-self.radius
+        ]  # [bsz, num_prototypes, spatial_size, spatial_size]
+        large_matrix_unpad = large_matrix_unpad.reshape(batch_size, num_points, -1)
+        # [bsz, num_prototypes, num_spatial_patches]
+        
         return large_matrix_unpad
     
 
