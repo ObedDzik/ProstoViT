@@ -60,9 +60,9 @@ def main(cfg):
 
     # Load datasets
     train_dataset, val_dataset = get_datasets(cfg=cfg.data)
-    train_loader = make_loader(dataset=train_dataset, cfg=cfg.data, shuffle=False, weighted=True, pin_memory=True, drop_last=True)
+    train_loader = make_loader(dataset=train_dataset, cfg=cfg.data, shuffle=True, weighted=False, pin_memory=True, drop_last=True)
     val_loader = make_loader(dataset=val_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)
-    train_push_dataset = get_datasets(cfg=cfg.data, augment=[], data_type='push', normalize=False)
+    train_push_dataset = get_datasets(cfg=cfg.data, augment='none', data_type='push', normalize=False)
     train_push_loader = make_loader(dataset=train_push_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)  # Changed: weighted=False for push
 
     log('training set size: {0}'.format(len(train_loader.dataset)))
@@ -81,7 +81,8 @@ def main(cfg):
         num_classes=cfg.train.num_classes,
         prototype_activation_function=cfg.train.prototype_activation_function,
         sig_temp=cfg.train.sig_temp,
-        add_on_layers_type=cfg.train.add_on_layers_type
+        add_on_layers_type=cfg.train.add_on_layers_type,
+        layers= cfg.train.layers
     )
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -128,6 +129,10 @@ def main(cfg):
         log('epoch: \t{0}'.format(epoch))
 
         if epoch < cfg.train.num_warm_epochs:
+            coefs['clst'] = 0.0
+            coefs['sep'] = 0.0
+            ppnet.warmup = True
+
             tnt.warm_only(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
                 model=ppnet, 
@@ -140,7 +145,21 @@ def main(cfg):
                 clst_k=cfg.train.k, 
                 sum_cls=cfg.train.sum_cls
             )
+
+            with torch.no_grad():
+                # Take one batch from train_loader
+                for x_batch in train_loader:
+                    _, _, max_activation_slots = ppnet(x_batch['bmode'].to('cuda'))
+                    proto_scores = max_activation_slots.mean(0)  # [num_prototypes]
+                    for c in range(ppnet.num_classes):
+                        start = c * ppnet.num_prototypes_per_class
+                        end = (c + 1) * ppnet.num_prototypes_per_class
+                        print(f"Class {c} proto mean:", proto_scores[start:end].mean().item())
+                    break 
+
         else:
+            coefs = cfg.train.coefs
+            ppnet.warmup = False
             tnt.joint(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
                 model=ppnet, 

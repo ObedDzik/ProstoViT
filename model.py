@@ -19,7 +19,8 @@ class PPNet(nn.Module):
                  prototype_activation_function='log',
                  sig_temp = 1.0,
                  radius = 3,
-                 add_on_layers_type='bottleneck'):
+                 add_on_layers_type='bottleneck',
+                 layers=None):
 
         super(PPNet, self).__init__()
         self.img_size = img_size
@@ -29,6 +30,8 @@ class PPNet(nn.Module):
         self.num_prototypes_per_class = self.num_prototypes // self.num_classes
         self.epsilon = 1e-4
         self.normalizer = nn.Softmax(dim=1)
+        self.layers = layers
+        self.warmup=False
         # prototype_activation_function could be 'log', 'linear',
         # or a generic function that converts distance to similarity score
         
@@ -119,18 +122,31 @@ class PPNet(nn.Module):
         elif self.arc == 'dinov3':
             x = x.reshape(x.size(0), -1, x.size(-1))
             x = torch.cat((cls_token, x), dim=1)
-            x = self.features.pos_drop(x)
             for blk in self.features.blocks:
                 x=blk(x)
             x=self.features.norm(x) # bsz, 197, dim
 
-        # patch_emb that adds global info 
+            # outputs = []
+            # x = x.reshape(x.size(0), -1, x.size(-1))
+            # x = torch.cat((cls_token, x), dim=1)
+            # for i, blk in enumerate(self.features.blocks):
+            #     x = blk(x)
+            #     if i in self.layers:
+            #         outputs.append(x)  # shape [B, N, D]
+            # x_flat = [x[:,1:,:] for x in outputs]
+            # x = torch.cat(x_flat, dim=-1)
+            # # x = self.features.norm(x)
+    
+        # patch_emb that adds global info
+        # if self.arc != 'dinov3':
         x_2 = x[:, 1:] - x[:, 0].unsqueeze(1) # bsz, 196, dim
-        #x = x[:,1:] # bsz, 196, dim
+        # else:
+        #     x_2 = x #x[:,1:] # bsz, 196, dim
         fea_len =x_2.shape[1] 
         B, fea_width, fea_height = x_2.shape[0],int(fea_len ** (1/2)), int(fea_len ** (1/2))
         feature_emb = x_2.permute(0,2,1).reshape(B, -1, fea_width, fea_height)
         #print(feature_emb.shape)
+
         return feature_emb
     
     def _cosine_convolution(self, x):
@@ -147,7 +163,8 @@ class PPNet(nn.Module):
         x = F.normalize(x,p=2,dim=1)
         now_prototype_vectors = F.normalize(self.prototype_vectors, p=2, dim=1)
         distances = F.conv2d(input=x, weight=now_prototype_vectors)#, stride=2)
-        #distances*= 10 # enables a larger gradient
+        # if self.arc=='dinov3':
+        #     distances*= 10 # enables a larger gradient
         return distances
     
     def prototype_distances(self, x):
@@ -174,28 +191,54 @@ class PPNet(nn.Module):
 
         return max_distances
     
+    # def subpatch_dist(self, x):
+    #     """
+    #     Input: data x 
+    #     output: conv_features, activation map for each subpatch concat into one tensor 
+    #     dist_all: bsz, num_proto, 14*14, 4 
+    #     (14*14): flatten number of activation map (vary by prototype size)
+    #     """
+    #     #slots = torch.sigmoid(self.patch_select*self.temp) # temp set large enough to approximate step functions 
+    #     #factor = ((slots.sum(-1))).unsqueeze(-1)# 1, 2000, 1, 1
+    #     dist_all = torch.FloatTensor().cuda()
+    #     conv_feature = self.conv_features(x)
+    #     conv_features_normed = F.normalize(conv_feature,p=2,dim=1)#/factor 
+    #     now_prototype_vectors= F.normalize(self.prototype_vectors,p=2,dim=1)#/factor
+    #     now_prototype_vectors = now_prototype_vectors#*slots/factor
+    #     n_p = self.prototype_shape[-1]
+    #     for i in range(n_p):
+    #         proto_i = now_prototype_vectors[:,:, i].unsqueeze(-1).unsqueeze(-1)
+    #         dist_i = F.conv2d(input=conv_features_normed, weight =proto_i).flatten(2).unsqueeze(-1) # bsz, n_p, 196,1 
+    #         #dist_i_standardized = dist_i
+    #         dist_all = torch.cat([dist_all, dist_i], dim=-1)
+    #     #dist_all = dist_all # bsz, 2000, 196, 4
+    #     return conv_feature, dist_all
+    
+    #debug
     def subpatch_dist(self, x):
         """
-        Input: data x 
-        output: conv_features, activation map for each subpatch concat into one tensor 
-        dist_all: bsz, num_proto, 14*14, 4 
-        (14*14): flatten number of activation map (vary by prototype size)
+        dist_all: [B, num_proto, H*W, n_p]
         """
-        #slots = torch.sigmoid(self.patch_select*self.temp) # temp set large enough to approximate step functions 
-        #factor = ((slots.sum(-1))).unsqueeze(-1)# 1, 2000, 1, 1
-        dist_all = torch.FloatTensor().cuda()
+        SIM_TEMP = 10.0  # <<< CRITICAL FIX (start with 10)
+
         conv_feature = self.conv_features(x)
-        conv_features_normed = F.normalize(conv_feature,p=2,dim=1)#/factor 
-        now_prototype_vectors= F.normalize(self.prototype_vectors,p=2,dim=1)#/factor
-        now_prototype_vectors = now_prototype_vectors#*slots/factor
+        conv_features_normed = F.normalize(conv_feature, p=2, dim=1)
+
+        proto = F.normalize(self.prototype_vectors, p=2, dim=1)
         n_p = self.prototype_shape[-1]
+
+        dist_all = []
+
         for i in range(n_p):
-            proto_i = now_prototype_vectors[:,:, i].unsqueeze(-1).unsqueeze(-1)
-            dist_i = F.conv2d(input=conv_features_normed, weight =proto_i).flatten(2).unsqueeze(-1) # bsz, n_p, 196,1 
-            #dist_i_standardized = dist_i
-            dist_all = torch.cat([dist_all, dist_i], dim=-1)
-        #dist_all = dist_all # bsz, 2000, 196, 4
+            proto_i = proto[:, :, i].unsqueeze(-1).unsqueeze(-1)
+            dist_i = SIM_TEMP * F.conv2d(
+                conv_features_normed, proto_i
+            ).flatten(2).unsqueeze(-1)
+            dist_all.append(dist_i)
+
+        dist_all = torch.cat(dist_all, dim=-1)
         return conv_feature, dist_all
+
     
     # def neigboring_mask(self, center_indices):
     #     """
@@ -319,6 +362,19 @@ class PPNet(nn.Module):
         get_f: bool indicate if we want to return conv_features
         """
         conv_features, dist_all = self.subpatch_dist(x)
+        if self.warmup: #debug
+            # dist_all: [B, num_proto, H*W, n_p]
+            max_subs, _ = dist_all.max(2)   # [B, num_proto, n_p]
+            n_p = self.prototype_shape[-1]
+
+            values = max_subs
+            max_activation_slots = values.sum(-1)
+            min_distances = n_p - max_activation_slots
+
+            if get_f:
+                return conv_features, min_distances, None
+
+            return max_activation_slots, min_distances, values
         slots = torch.sigmoid(self.patch_select*self.temp) # temp set large enough to approximate step functions
         factor = ((slots.sum(-1))).unsqueeze(-1) + 1e-10# 1, 2000, 1, avoid 0 division
         #slots = self.soft_round(slots)
@@ -397,6 +453,9 @@ class PPNet(nn.Module):
     def forward(self, x):
         max_activation, min_distances, values = self.greedy_distance(x)
         logits = self.last_layer(max_activation)
+
+        if self.warmup: #debug
+            logits = logits - logits.mean(dim=1, keepdim=True)
         return logits, min_distances, values
     
     def __repr__(self):
@@ -436,6 +495,11 @@ class PPNet(nn.Module):
     def _initialize_weights(self):
 
         self.set_last_layer_incorrect_connection(incorrect_strength=-0.5)
+        with torch.no_grad(): #debug
+            self.last_layer.weight.zero_()
+            for p in range(self.num_prototypes):
+                cls = p // self.num_prototypes_per_class
+                self.last_layer.weight[cls, p] = 1.0
 
 
 
@@ -444,7 +508,8 @@ def construct_PPNet(base_architecture, pretrained=True, img_size=224,
                     prototype_activation_function='log',
                     sig_temp = 1.0,
                     radius = 1,
-                    add_on_layers_type='bottleneck'):
+                    add_on_layers_type='bottleneck',
+                    layers=None):
     features = base_architecture_to_features[base_architecture](pretrained=pretrained)
 
     return PPNet(features=features,
@@ -455,5 +520,6 @@ def construct_PPNet(base_architecture, pretrained=True, img_size=224,
                  prototype_activation_function=prototype_activation_function,
                  radius = radius,
                  sig_temp = sig_temp,
-                 add_on_layers_type=add_on_layers_type)
+                 add_on_layers_type=add_on_layers_type,
+                 layers=layers)
 

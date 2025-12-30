@@ -158,13 +158,15 @@ class ProstateDataset(Dataset):
 
 def get_datasets(*, cfg, **kwargs):
     cohort_mode = kwargs.get("cohort_selection_mode", getattr(cfg, "cohort_selection_mode", "splits_file"))
-    augment = kwargs.get("augment", getattr(cfg, "augmentations", []))
+    augment = kwargs.get("augment", getattr(cfg, "augmentations", "none"))
+    augment_strength = cfg.get('augment_strength', 'medium')
     return_raw_images = kwargs.get("return_raw_images", getattr(cfg, "return_raw_images", False))
     data_type = kwargs.get("data_type", getattr(cfg, "data_type", None))
     normalize = kwargs.get("normalize", getattr(cfg, "normalize", True))
 
     train_transform = ProstateTransform(
         augment=augment,
+        augment_strength=augment_strength,
         image_size=cfg.image_size,
         mask_size=cfg.mask_size,
         mean=cfg.mean,
@@ -181,6 +183,7 @@ def get_datasets(*, cfg, **kwargs):
 
     val_transform = ProstateTransform(
         augment="none",
+        augment_strength = 'none',
         image_size=cfg.image_size,
         mask_size=cfg.mask_size,
         mean=cfg.mean,
@@ -259,7 +262,7 @@ def get_datasets(*, cfg, **kwargs):
         raise ValueError(f"Unknown cohort selection mode: {cohort_mode}")
     
     if data_type == 'push':
-        return train_dataset
+        return make_dataset(data_of_interest.get("train"), val_transform)
     else:
         return train_dataset, val_dataset
 
