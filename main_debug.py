@@ -129,9 +129,12 @@ def main(cfg):
         log('epoch: \t{0}'.format(epoch))
 
         if epoch < cfg.train.num_warm_epochs:
-            coefs['clst'] = 0.0
-            coefs['sep'] = 0.0
-            ppnet.warmup = True
+            # coefs['clst'] = 0.0
+            # coefs['sep'] = 0.0
+            # coefs['l1'] = 0.0         
+            # coefs['orth'] = 0.0      
+            # coefs['coh'] = 0.0 
+            ppnet.warmup = False
 
             tnt.warm_only(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
@@ -158,7 +161,7 @@ def main(cfg):
                     break 
 
         else:
-            coefs = cfg.train.coefs
+            # coefs = cfg.train.coefs
             ppnet.warmup = False
             tnt.joint(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
@@ -173,6 +176,17 @@ def main(cfg):
                 sum_cls=cfg.train.sum_cls
             )
             joint_lr_scheduler.step()
+
+            with torch.no_grad():
+                # Take one batch from train_loader
+                for x_batch in train_loader:
+                    _, _, max_activation_slots = ppnet(x_batch['bmode'].to('cuda'))
+                    proto_scores = max_activation_slots.mean(0)  # [num_prototypes]
+                    for c in range(ppnet.num_classes):
+                        start = c * ppnet.num_prototypes_per_class
+                        end = (c + 1) * ppnet.num_prototypes_per_class
+                        print(f"Class {c} proto mean:", proto_scores[start:end].mean().item())
+                    break 
 
         accu, val_loss = tnt.test(
             model=ppnet, 

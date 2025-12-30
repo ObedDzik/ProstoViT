@@ -6,6 +6,7 @@ from torchvision.tv_tensors import Image, Mask
 from typing import Any, Dict, List, Sequence
 from torchvision import tv_tensors as tvt
 from utils import CropToMask, RandomGamma, RandomContrast, RandomNeedlePatch
+from scipy.ndimage import gaussian_filter
 
 
 psa_min = 0.2
@@ -176,10 +177,12 @@ CORE_LOCATION_TO_IDX = {
 #         return out
 
 
+
+
 class ProstateTransform:
     def __init__(
         self,
-        augment="all",  # Changed default
+        augment="all",
         image_size=224,
         mask_size=256,
         mean=(0, 0, 0),
@@ -191,7 +194,7 @@ class ProstateTransform:
         return_raw_images=False,
         grade_group_for_positive_label=1,
         flip_ud=False,
-        augment_strength='medium',  # 'light', 'medium', 'strong'
+        augment_strength='light',  # Changed default to 'light' for ProtoViT
     ):
         self.augmentations = augment
         self.image_size = image_size
@@ -212,58 +215,89 @@ class ProstateTransform:
 
     def _coerce_input(self, item):
         if 'image' in item:
-            # this is from the OPTMUM needle dataset format. We need to convert it to the standard format.
+            # this is from the OPTIMUM needle dataset format. We need to convert it to the standard format.
             item = _ProstateDatasetAdapterOptimum()(item)
         return item
 
     def _set_augment_params(self):
-        """Set augmentation parameters based on strength level"""
+        """Set augmentation parameters based on strength level - tuned for ProtoViT"""
         if self.augment_strength == 'light':
             self.aug_params = {
                 'rotation_degrees': 10,
-                'translate': (0.1, 0.1),
-                'scale': (0.85, 1.15),
-                'gamma_range': (0.8, 1.2),
-                'contrast_range': (0.8, 1.2),
-                'brightness_delta': 0.1,
-                'noise_std': 0.02,
-                'blur_kernel': 3,
-                'apply_prob': 0.3,
+                'translate': (0.05, 0.05),
+                'scale': (0.9, 1.1),
+                'gamma_range': (0.85, 1.15),
+                'contrast_range': (0.85, 1.15),
+                'brightness_delta': 0.08,
+                'noise_std': 0.015,
+                'blur_sigma_range': (0.1, 0.5),
+                'sharpness_factor': 1.5,
+                'geometric_prob': 0.3,
+                'intensity_prob': 0.25,
+                'cutout_prob': 0.15,
+                'cutout_size': (0.1, 0.2),  # fraction of image
             }
         elif self.augment_strength == 'medium':
             self.aug_params = {
-                'rotation_degrees': 20,
-                'translate': (0.15, 0.15),
-                'scale': (0.75, 1.25),
-                'gamma_range': (0.7, 1.4),
-                'contrast_range': (0.7, 1.3),
-                'brightness_delta': 0.15,
-                'noise_std': 0.03,
-                'blur_kernel': 5,
-                'apply_prob': 0.5,
+                'rotation_degrees': 15,
+                'translate': (0.1, 0.1),
+                'scale': (0.85, 1.15),
+                'gamma_range': (0.75, 1.3),
+                'contrast_range': (0.8, 1.25),
+                'brightness_delta': 0.12,
+                'noise_std': 0.025,
+                'blur_sigma_range': (0.1, 1.0),
+                'sharpness_factor': 1.8,
+                'geometric_prob': 0.4,
+                'intensity_prob': 0.35,
+                'cutout_prob': 0.25,
+                'cutout_size': (0.15, 0.25),
             }
         elif self.augment_strength == 'strong':
             self.aug_params = {
-                'rotation_degrees': 30,
-                'translate': (0.2, 0.2),
-                'scale': (0.7, 1.3),
-                'gamma_range': (0.6, 1.6),
-                'contrast_range': (0.6, 1.5),
-                'brightness_delta': 0.2,
-                'noise_std': 0.05,
-                'blur_kernel': 7,
-                'apply_prob': 0.7,
+                'rotation_degrees': 20,
+                'translate': (0.15, 0.15),
+                'scale': (0.8, 1.2),
+                'gamma_range': (0.7, 1.4),
+                'contrast_range': (0.7, 1.3),
+                'brightness_delta': 0.15,
+                'noise_std': 0.035,
+                'blur_sigma_range': (0.1, 1.5),
+                'sharpness_factor': 2.0,
+                'geometric_prob': 0.5,
+                'intensity_prob': 0.4,
+                'cutout_prob': 0.3,
+                'cutout_size': (0.2, 0.3),
             }
         else:
-            self.aug_params =[]
+            self.aug_params = None
+
+    def _apply_cutout(self, image_tensor, cutout_size):
+        """Apply random cutout/erasing to encourage diverse prototype learning"""
+        c, h, w = image_tensor.shape
+        
+        # Random cutout size
+        cutout_h = int(h * torch.FloatTensor(1).uniform_(*cutout_size).item())
+        cutout_w = int(w * torch.FloatTensor(1).uniform_(*cutout_size).item())
+        
+        # Random position
+        top = torch.randint(0, h - cutout_h + 1, (1,)).item()
+        left = torch.randint(0, w - cutout_w + 1, (1,)).item()
+        
+        # Fill with random gray value (realistic for ultrasound)
+        fill_value = torch.FloatTensor(1).uniform_(0.3, 0.7).item()
+        image_tensor[:, top:top+cutout_h, left:left+cutout_w] = fill_value
+        
+        return image_tensor
 
     def _apply_augmentations(self, bmode_tensor, needle_mask_tensor, prostate_mask_tensor, is_training=True):
-        """Apply augmentations with proper probability control"""
+        """Apply augmentations with proper probability control and correct implementations"""
         
-        if not is_training or self.augmentations == "none":
+        if not is_training or self.augmentations == "none" or self.aug_params is None:
             return bmode_tensor, needle_mask_tensor, prostate_mask_tensor
         
-        p = self.aug_params['apply_prob']
+        geo_p = self.aug_params['geometric_prob']
+        int_p = self.aug_params['intensity_prob']
         
         # 1. GEOMETRIC AUGMENTATIONS (apply to image and masks together)
         
@@ -273,14 +307,14 @@ class ProstateTransform:
             needle_mask_tensor = T.functional.hflip(needle_mask_tensor)
             prostate_mask_tensor = T.functional.hflip(prostate_mask_tensor)
         
-        # Random vertical flip (in addition to or instead of fixed flip_ud)
+        # Random vertical flip
         if torch.rand(1).item() < 0.5:
             bmode_tensor = T.functional.vflip(bmode_tensor)
             needle_mask_tensor = T.functional.vflip(needle_mask_tensor)
             prostate_mask_tensor = T.functional.vflip(prostate_mask_tensor)
         
         # Random rotation
-        if torch.rand(1).item() < p:
+        if torch.rand(1).item() < geo_p:
             angle = torch.FloatTensor(1).uniform_(
                 -self.aug_params['rotation_degrees'], 
                 self.aug_params['rotation_degrees']
@@ -292,92 +326,85 @@ class ProstateTransform:
             prostate_mask_tensor = T.functional.rotate(prostate_mask_tensor, angle, 
                                                       interpolation=InterpolationMode.NEAREST)
         
-        # Random affine (translation + scale)
-        if torch.rand(1).item() < p:
+        # Random affine (translation + scale) - FIXED IMPLEMENTATION
+        if torch.rand(1).item() < geo_p:
             translate = self.aug_params['translate']
             scale = self.aug_params['scale']
             
-            bmode_tensor, needle_mask_tensor, prostate_mask_tensor = T.RandomAffine(
-                degrees=0,
-                translate=translate,
-                scale=scale,
-                interpolation=InterpolationMode.BILINEAR
-            )(bmode_tensor, needle_mask_tensor, prostate_mask_tensor)
-        
-        # Random resized crop (zoom in/out)
-        if torch.rand(1).item() < p:
-            scale = self.aug_params['scale']
-            bmode_tensor, needle_mask_tensor, prostate_mask_tensor = T.RandomResizedCrop(
-                size=(self.image_size, self.image_size),
-                scale=scale,
-                ratio=(0.9, 1.1),  # Keep aspect ratio relatively constant for medical images
-                interpolation=InterpolationMode.BILINEAR
-            )(bmode_tensor, needle_mask_tensor, prostate_mask_tensor)
+            # Get random parameters
+            scale_factor = torch.FloatTensor(1).uniform_(*scale).item()
+            translate_x = torch.FloatTensor(1).uniform_(-translate[0], translate[0]).item()
+            translate_y = torch.FloatTensor(1).uniform_(-translate[1], translate[1]).item()
+            
+            # Apply same affine transform to all tensors
+            affine_params = {
+                'angle': 0,
+                'translate': (int(translate_x * bmode_tensor.shape[-1]), 
+                             int(translate_y * bmode_tensor.shape[-2])),
+                'scale': scale_factor,
+                'shear': 0
+            }
+            
+            bmode_tensor = T.functional.affine(bmode_tensor, 
+                                              interpolation=InterpolationMode.BILINEAR,
+                                              **affine_params)
+            needle_mask_tensor = T.functional.affine(needle_mask_tensor, 
+                                                    interpolation=InterpolationMode.NEAREST,
+                                                    **affine_params)
+            prostate_mask_tensor = T.functional.affine(prostate_mask_tensor, 
+                                                      interpolation=InterpolationMode.NEAREST,
+                                                      **affine_params)
         
         # 2. INTENSITY AUGMENTATIONS (apply to image only)
+        # Reduced frequency compared to original to preserve diagnostic features
         
         # Random gamma correction (simulates different ultrasound gain settings)
-        if torch.rand(1).item() < p:
+        if torch.rand(1).item() < int_p:
             gamma = torch.FloatTensor(1).uniform_(*self.aug_params['gamma_range']).item()
-            bmode_tensor = RandomGamma(gamma_range=(gamma, gamma))(bmode_tensor)
+            # Clamp to [0, 1] before applying gamma
+            bmode_tensor = torch.clamp(bmode_tensor, 0, 1)
+            bmode_tensor = torch.pow(bmode_tensor, gamma)
         
         # Random contrast (simulates different ultrasound TGC settings)
-        if torch.rand(1).item() < p:
+        if torch.rand(1).item() < int_p:
             contrast = torch.FloatTensor(1).uniform_(*self.aug_params['contrast_range']).item()
-            bmode_tensor = RandomContrast(contrast_range=(contrast, contrast))(bmode_tensor)
+            mean = bmode_tensor.mean(dim=[1, 2], keepdim=True)
+            bmode_tensor = (bmode_tensor - mean) * contrast + mean
+            bmode_tensor = torch.clamp(bmode_tensor, 0, 1)
         
         # Random brightness
-        if torch.rand(1).item() < p:
-            brightness_factor = 1.0 + torch.FloatTensor(1).uniform_(
-                -self.aug_params['brightness_delta'], 
-                self.aug_params['brightness_delta']
+        if torch.rand(1).item() < int_p:
+            brightness_factor = torch.FloatTensor(1).uniform_(
+                1.0 - self.aug_params['brightness_delta'], 
+                1.0 + self.aug_params['brightness_delta']
             ).item()
             bmode_tensor = bmode_tensor * brightness_factor
             bmode_tensor = torch.clamp(bmode_tensor, 0, 1)
         
         # Random Gaussian noise (simulates ultrasound speckle noise)
-        if torch.rand(1).item() < p:
+        if torch.rand(1).item() < int_p * 0.7:
             noise = torch.randn_like(bmode_tensor) * self.aug_params['noise_std']
             bmode_tensor = bmode_tensor + noise
             bmode_tensor = torch.clamp(bmode_tensor, 0, 1)
         
         # Random Gaussian blur (simulates different ultrasound frequencies)
-        if torch.rand(1).item() < p * 0.5:  # Apply less frequently
-            kernel_size = self.aug_params['blur_kernel']
-            sigma = torch.FloatTensor(1).uniform_(0.1, 2.0).item()
+        if torch.rand(1).item() < int_p * 0.5:
+            sigma = torch.FloatTensor(1).uniform_(*self.aug_params['blur_sigma_range']).item()
+            # Use odd kernel size based on sigma
+            kernel_size = int(2 * np.ceil(3 * sigma) + 1)
+            kernel_size = max(3, kernel_size if kernel_size % 2 == 1 else kernel_size + 1)
             bmode_tensor = T.GaussianBlur(kernel_size=kernel_size, sigma=sigma)(bmode_tensor)
         
-        # Random sharpening (opposite of blur)
-        if torch.rand(1).item() < p * 0.3:  # Apply even less frequently
-            bmode_tensor = T.RandomAdjustSharpness(sharpness_factor=2.0, p=1.0)(bmode_tensor)
+        # Random sharpening (mutually exclusive with blur in same augmentation)
+        elif torch.rand(1).item() < int_p * 0.3:
+            sharpness = self.aug_params['sharpness_factor']
+            bmode_tensor = T.functional.adjust_sharpness(bmode_tensor, sharpness)
         
-        # Elastic deformation (advanced - simulates tissue compression)
-        if torch.rand(1).item() < p * 0.3:  # Apply sparingly
-            bmode_tensor = self._elastic_transform(bmode_tensor, alpha=20, sigma=5)
+        # Random cutout/erasing (helps ProtoViT learn diverse prototypes)
+        if torch.rand(1).item() < self.aug_params['cutout_prob']:
+            bmode_tensor = self._apply_cutout(bmode_tensor, self.aug_params['cutout_size'])
         
         return bmode_tensor, needle_mask_tensor, prostate_mask_tensor
-    
-    def _elastic_transform(self, image, alpha=20, sigma=5):
-        """Apply elastic deformation to simulate tissue compression in ultrasound"""
-        # Simple implementation - you can make this more sophisticated
-        import scipy.ndimage as ndimage
-        
-        shape = image.shape[-2:]
-        dx = torch.randn(shape) * alpha
-        dy = torch.randn(shape) * alpha
-        
-        # Smooth the displacement fields
-        dx = torch.from_numpy(ndimage.gaussian_filter(dx.numpy(), sigma)).float()
-        dy = torch.from_numpy(ndimage.gaussian_filter(dy.numpy(), sigma)).float()
-        
-        # Create meshgrid for sampling
-        x, y = torch.meshgrid(torch.arange(shape[0]), torch.arange(shape[1]), indexing='ij')
-        indices = torch.stack([x + dx, y + dy], dim=0)
-        
-        # Apply displacement (simplified - full implementation would use grid_sample)
-        # For now, just return original image to avoid complexity
-        # You can implement proper elastic transform if needed
-        return image
 
     def __call__(self, item):
         item = self._coerce_input(item)
@@ -397,53 +424,46 @@ class ProstateTransform:
             out['needle_mask_raw'] = needle_mask.copy() 
             out['prostate_mask_raw'] = prostate_mask.copy()
 
-        # Convert to tensor (before normalization)
-        bmode_tensor = torch.from_numpy(bmode.copy()).float().unsqueeze(0).repeat(3,1,1)
+        # Convert to tensor
+        bmode_tensor = torch.from_numpy(bmode.copy()).float().unsqueeze(0).repeat(3, 1, 1)
         bmode_tensor = (bmode_tensor - bmode_tensor.min()) / (bmode_tensor.max() - bmode_tensor.min() + 1e-8)
         
         needle_mask_tensor = torch.from_numpy(needle_mask.copy()).float().unsqueeze(0)
         prostate_mask_tensor = torch.from_numpy(prostate_mask.copy()).float().unsqueeze(0)
 
-        # Handle needle patches (if needed)
-        needle_patches = []
-        if getattr(self, "crop_to_needle", False):
-            needle_patches = RandomNeedlePatch(
-                patch_size=128,       
-                num_patches=5,
-                resize_to=self.image_size 
-            )(Image(bmode_tensor), Mask(needle_mask_tensor))
-
-        # Resize to target size first
-        bmode_tensor = T.Resize((self.image_size, self.image_size), antialias=True)(bmode_tensor)
-        needle_mask_tensor = T.Resize((self.image_size, self.image_size), 
-                                     antialias=False, 
-                                     interpolation=InterpolationMode.NEAREST)(needle_mask_tensor)
-        prostate_mask_tensor = T.Resize((self.image_size, self.image_size), 
-                                       antialias=False, 
-                                       interpolation=InterpolationMode.NEAREST)(prostate_mask_tensor)
-
-        # Crop to prostate if requested
+        # IMPROVED ORDER: Crop to prostate first (on full resolution)
         if self.crop_to_prostate:
             bmode_tensor, needle_mask_tensor, prostate_mask_tensor = CropToMask('prostate_mask', 16)(
                 dict(bmode=Image(bmode_tensor), 
                      needle_mask=Mask(needle_mask_tensor), 
                      prostate_mask=Mask(prostate_mask_tensor))
             ).values()
-            
-            # Resize back to target size after crop
-            bmode_tensor = T.Resize((self.image_size, self.image_size), antialias=True)(bmode_tensor)
-            needle_mask_tensor = T.Resize((self.image_size, self.image_size), 
-                                         antialias=False, 
-                                         interpolation=InterpolationMode.NEAREST)(needle_mask_tensor)
-            prostate_mask_tensor = T.Resize((self.image_size, self.image_size), 
-                                           antialias=False, 
-                                           interpolation=InterpolationMode.NEAREST)(prostate_mask_tensor)
 
-        # APPLY ALL AUGMENTATIONS HERE (before normalization)
+        # APPLY AUGMENTATIONS (on cropped, full-resolution images)
         is_training = self.augmentations != "none"
         bmode_tensor, needle_mask_tensor, prostate_mask_tensor = self._apply_augmentations(
             bmode_tensor, needle_mask_tensor, prostate_mask_tensor, is_training=is_training
         )
+
+        # THEN resize to target size (after augmentation)
+        bmode_tensor = T.Resize((self.image_size, self.image_size), 
+                               interpolation=InterpolationMode.BILINEAR,
+                               antialias=True)(bmode_tensor)
+        needle_mask_tensor = T.Resize((self.image_size, self.image_size), 
+                                     interpolation=InterpolationMode.NEAREST,
+                                     antialias=False)(needle_mask_tensor)
+        prostate_mask_tensor = T.Resize((self.image_size, self.image_size), 
+                                       interpolation=InterpolationMode.NEAREST,
+                                       antialias=False)(prostate_mask_tensor)
+
+        # Handle needle patches (if needed)
+        needle_patches = []
+        if self.crop_to_needle:
+            needle_patches = RandomNeedlePatch(
+                patch_size=128,       
+                num_patches=5,
+                resize_to=self.image_size 
+            )(Image(bmode_tensor), Mask(needle_mask_tensor))
 
         # Normalize AFTER augmentation
         if self.normalize:
@@ -452,11 +472,13 @@ class ProstateTransform:
         # Resize masks to mask_size
         needle_mask_tensor = T.Resize(
             (self.mask_size, self.mask_size),
-            antialias=False, interpolation=InterpolationMode.NEAREST
+            interpolation=InterpolationMode.NEAREST,
+            antialias=False
         )(needle_mask_tensor)
         prostate_mask_tensor = T.Resize(
             (self.mask_size, self.mask_size),
-            antialias=False, interpolation=InterpolationMode.NEAREST
+            interpolation=InterpolationMode.NEAREST,
+            antialias=False
         )(prostate_mask_tensor)
 
         out["bmode"] = bmode_tensor
@@ -464,13 +486,14 @@ class ProstateTransform:
         out["prostate_mask"] = prostate_mask_tensor
         out["needle_patches"] = needle_patches
 
+        # Handle labels and clinical features
         if "grade_group" in item:
             label = item["grade_group"]
             if torch.isnan(torch.tensor(label)):
                 label = 0
             out["label"] = torch.tensor(label).long()
         if "primus" in item:
-            out["primus_label"] = torch.tensor(item["primus"]-1).long() 
+            out["primus_label"] = torch.tensor(item["primus"] - 1).long() 
 
         if "psa" in item:
             psa = item["psa"] if not np.isnan(item["psa"]) else psa_avg

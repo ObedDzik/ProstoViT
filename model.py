@@ -191,53 +191,53 @@ class PPNet(nn.Module):
 
         return max_distances
     
-    # def subpatch_dist(self, x):
-    #     """
-    #     Input: data x 
-    #     output: conv_features, activation map for each subpatch concat into one tensor 
-    #     dist_all: bsz, num_proto, 14*14, 4 
-    #     (14*14): flatten number of activation map (vary by prototype size)
-    #     """
-    #     #slots = torch.sigmoid(self.patch_select*self.temp) # temp set large enough to approximate step functions 
-    #     #factor = ((slots.sum(-1))).unsqueeze(-1)# 1, 2000, 1, 1
-    #     dist_all = torch.FloatTensor().cuda()
-    #     conv_feature = self.conv_features(x)
-    #     conv_features_normed = F.normalize(conv_feature,p=2,dim=1)#/factor 
-    #     now_prototype_vectors= F.normalize(self.prototype_vectors,p=2,dim=1)#/factor
-    #     now_prototype_vectors = now_prototype_vectors#*slots/factor
-    #     n_p = self.prototype_shape[-1]
-    #     for i in range(n_p):
-    #         proto_i = now_prototype_vectors[:,:, i].unsqueeze(-1).unsqueeze(-1)
-    #         dist_i = F.conv2d(input=conv_features_normed, weight =proto_i).flatten(2).unsqueeze(-1) # bsz, n_p, 196,1 
-    #         #dist_i_standardized = dist_i
-    #         dist_all = torch.cat([dist_all, dist_i], dim=-1)
-    #     #dist_all = dist_all # bsz, 2000, 196, 4
-    #     return conv_feature, dist_all
-    
-    #debug
     def subpatch_dist(self, x):
         """
-        dist_all: [B, num_proto, H*W, n_p]
+        Input: data x 
+        output: conv_features, activation map for each subpatch concat into one tensor 
+        dist_all: bsz, num_proto, 14*14, 4 
+        (14*14): flatten number of activation map (vary by prototype size)
         """
-        SIM_TEMP = 10.0  # <<< CRITICAL FIX (start with 10)
-
+        #slots = torch.sigmoid(self.patch_select*self.temp) # temp set large enough to approximate step functions 
+        #factor = ((slots.sum(-1))).unsqueeze(-1)# 1, 2000, 1, 1
+        dist_all = torch.FloatTensor().cuda()
         conv_feature = self.conv_features(x)
-        conv_features_normed = F.normalize(conv_feature, p=2, dim=1)
-
-        proto = F.normalize(self.prototype_vectors, p=2, dim=1)
+        conv_features_normed = F.normalize(conv_feature,p=2,dim=1)#/factor 
+        now_prototype_vectors= F.normalize(self.prototype_vectors,p=2,dim=1)#/factor
+        now_prototype_vectors = now_prototype_vectors#*slots/factor
         n_p = self.prototype_shape[-1]
-
-        dist_all = []
-
         for i in range(n_p):
-            proto_i = proto[:, :, i].unsqueeze(-1).unsqueeze(-1)
-            dist_i = SIM_TEMP * F.conv2d(
-                conv_features_normed, proto_i
-            ).flatten(2).unsqueeze(-1)
-            dist_all.append(dist_i)
-
-        dist_all = torch.cat(dist_all, dim=-1)
+            proto_i = now_prototype_vectors[:,:, i].unsqueeze(-1).unsqueeze(-1)
+            dist_i = F.conv2d(input=conv_features_normed, weight =proto_i).flatten(2).unsqueeze(-1) # bsz, n_p, 196,1 
+            #dist_i_standardized = dist_i
+            dist_all = torch.cat([dist_all, dist_i], dim=-1)
+        #dist_all = dist_all # bsz, 2000, 196, 4
         return conv_feature, dist_all
+    
+    #debug
+    # def subpatch_dist(self, x):
+    #     """
+    #     dist_all: [B, num_proto, H*W, n_p]
+    #     """
+    #     SIM_TEMP = 10.0  # <<< CRITICAL FIX (start with 10)
+
+    #     conv_feature = self.conv_features(x)
+    #     conv_features_normed = F.normalize(conv_feature, p=2, dim=1)
+
+    #     proto = F.normalize(self.prototype_vectors, p=2, dim=1)
+    #     n_p = self.prototype_shape[-1]
+
+    #     dist_all = []
+
+    #     for i in range(n_p):
+    #         proto_i = proto[:, :, i].unsqueeze(-1).unsqueeze(-1)
+    #         dist_i = SIM_TEMP * F.conv2d(
+    #             conv_features_normed, proto_i
+    #         ).flatten(2).unsqueeze(-1)
+    #         dist_all.append(dist_i)
+
+    #     dist_all = torch.cat(dist_all, dim=-1)
+    #     return conv_feature, dist_all
 
     
     # def neigboring_mask(self, center_indices):
@@ -454,8 +454,8 @@ class PPNet(nn.Module):
         max_activation, min_distances, values = self.greedy_distance(x)
         logits = self.last_layer(max_activation)
 
-        if self.warmup: #debug
-            logits = logits - logits.mean(dim=1, keepdim=True)
+        # if self.warmup: #debug
+        #     logits = logits - logits.mean(dim=1, keepdim=True)
         return logits, min_distances, values
     
     def __repr__(self):
@@ -495,11 +495,11 @@ class PPNet(nn.Module):
     def _initialize_weights(self):
 
         self.set_last_layer_incorrect_connection(incorrect_strength=-0.5)
-        with torch.no_grad(): #debug
-            self.last_layer.weight.zero_()
-            for p in range(self.num_prototypes):
-                cls = p // self.num_prototypes_per_class
-                self.last_layer.weight[cls, p] = 1.0
+        # with torch.no_grad(): #debug
+        #     self.last_layer.weight.zero_()
+        #     for p in range(self.num_prototypes):
+        #         cls = p // self.num_prototypes_per_class
+        #         self.last_layer.weight[cls, p] = 1.0
 
 
 
