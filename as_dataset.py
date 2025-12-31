@@ -154,6 +154,9 @@ class ProstateDataset(Dataset):
             replacement=True,
         )
         return sampler
+    
+    def set_aug_strength(self, strength):
+        self.transform.set_aug_strength(strength)
 
 
 def get_datasets(*, cfg, **kwargs):

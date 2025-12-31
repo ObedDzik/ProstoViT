@@ -209,6 +209,7 @@ class ProstateTransform:
         self.grade_group_for_positive_label = grade_group_for_positive_label
         self.flip_ud = flip_ud
         self.augment_strength = augment_strength
+        self.aug_strength = 0.5
         
         # Define augmentation parameters based on strength
         self._set_augment_params()
@@ -218,6 +219,9 @@ class ProstateTransform:
             # this is from the OPTIMUM needle dataset format. We need to convert it to the standard format.
             item = _ProstateDatasetAdapterOptimum()(item)
         return item
+    
+    def set_aug_strength(self, strength):
+        self.aug_strength = float(strength)
 
     def _set_augment_params(self):
         """Set augmentation parameters based on strength level - tuned for ProtoViT"""
@@ -255,20 +259,22 @@ class ProstateTransform:
             }
         elif self.augment_strength == 'strong':
             self.aug_params = {
-                'rotation_degrees': 20,
-                'translate': (0.15, 0.15),
-                'scale': (0.8, 1.2),
-                'gamma_range': (0.7, 1.4),
-                'contrast_range': (0.7, 1.3),
-                'brightness_delta': 0.15,
-                'noise_std': 0.035,
-                'blur_sigma_range': (0.1, 1.5),
-                'sharpness_factor': 2.0,
-                'geometric_prob': 0.5,
-                'intensity_prob': 0.4,
-                'cutout_prob': 0.3,
-                'cutout_size': (0.2, 0.3),
+                'rotation_degrees': 30, #20,
+                'translate': (0.25, 0.25), #(0.15, 0.15),
+                'scale': (0.7, 1.3), #(0.8, 1.2),
+                'shear_range': (-8.0 * self.aug_strength, 8.0 * self.aug_strength),
+                'gamma_range': (0.5, 1.6), #(0.7, 1.4),
+                'contrast_range':  (0.6, 1.5), #(0.7, 1.3),
+                'brightness_delta': 0.25, #0.15,
+                'noise_std': 0.06, #0.035,
+                'blur_sigma_range': (0.1, 2.2), #(0.1, 1.5),
+                'sharpness_factor': 2.5, #2.0,
+                'geometric_prob': 0.75, #0.6, #0.5,
+                'intensity_prob': 0.75, #0.6, #0.4,
+                'cutout_prob': 0.6, #0.4, #0.3,
+                'cutout_size': (0.25, 0.45), #(0.3, 0.4) #(0.2, 0.3),
             }
+
         else:
             self.aug_params = None
 
@@ -296,64 +302,107 @@ class ProstateTransform:
         if not is_training or self.augmentations == "none" or self.aug_params is None:
             return bmode_tensor, needle_mask_tensor, prostate_mask_tensor
         
-        geo_p = self.aug_params['geometric_prob']
-        int_p = self.aug_params['intensity_prob']
-        
-        # 1. GEOMETRIC AUGMENTATIONS (apply to image and masks together)
-        
-        # Random horizontal flip
-        # if torch.rand(1).item() < 0.5:
-        #     bmode_tensor = T.functional.hflip(bmode_tensor)
-        #     needle_mask_tensor = T.functional.hflip(needle_mask_tensor)
-        #     prostate_mask_tensor = T.functional.hflip(prostate_mask_tensor)
-        
-        # # Random vertical flip
-        # if torch.rand(1).item() < 0.5:
-        #     bmode_tensor = T.functional.vflip(bmode_tensor)
-        #     needle_mask_tensor = T.functional.vflip(needle_mask_tensor)
-        #     prostate_mask_tensor = T.functional.vflip(prostate_mask_tensor)
-        
-        # Random rotation
-        # if torch.rand(1).item() < geo_p:
-        #     angle = torch.FloatTensor(1).uniform_(
-        #         -self.aug_params['rotation_degrees'], 
-        #         self.aug_params['rotation_degrees']
-        #     ).item()
-        #     bmode_tensor = T.functional.rotate(bmode_tensor, angle, 
-        #                                       interpolation=InterpolationMode.BILINEAR)
-        #     needle_mask_tensor = T.functional.rotate(needle_mask_tensor, angle, 
-        #                                             interpolation=InterpolationMode.NEAREST)
-        #     prostate_mask_tensor = T.functional.rotate(prostate_mask_tensor, angle, 
-        #                                               interpolation=InterpolationMode.NEAREST)
-        
+        geo_p = self.aug_params['geometric_prob'] * self.aug_strength
+        int_p = self.aug_params['intensity_prob'] * self.aug_strength
+        cutout_p = self.aug_params['cutout_prob'] * self.aug_strength
+        self.aug_params['shear_range'] = [deg * self.aug_strength for deg in self.aug_params['shear_range']]
+       
+        # 0. RANDOM RESIZED CROP (before affine)
+        if torch.rand(1).item() < 0.6:
+            i, j, h, w = T.RandomResizedCrop.get_params(
+                bmode_tensor,
+                scale=(0.6, 1.0),
+                ratio=(0.85, 1.15)
+            )
+
+            bmode_tensor = T.functional.resized_crop(
+                bmode_tensor, i, j, h, w,
+                size=bmode_tensor.shape[-2:],
+                interpolation=InterpolationMode.BILINEAR
+            )
+            needle_mask_tensor = T.functional.resized_crop(
+                needle_mask_tensor, i, j, h, w,
+                size=bmode_tensor.shape[-2:],
+                interpolation=InterpolationMode.NEAREST
+            )
+            prostate_mask_tensor = T.functional.resized_crop(
+                prostate_mask_tensor, i, j, h, w,
+                size=bmode_tensor.shape[-2:],
+                interpolation=InterpolationMode.NEAREST
+            )
+
         # Random affine (translation + scale) - FIXED IMPLEMENTATION
+        # if torch.rand(1).item() < geo_p:
+        #     translate = self.aug_params['translate']
+        #     scale = self.aug_params['scale']
+            
+        #     # Get random parameters
+        #     scale_factor = torch.FloatTensor(1).uniform_(*scale).item()
+        #     translate_x = torch.FloatTensor(1).uniform_(-translate[0], translate[0]).item()
+        #     translate_y = torch.FloatTensor(1).uniform_(-translate[1], translate[1]).item()
+            
+        #     # Apply same affine transform to all tensors
+        #     affine_params = {
+        #         'angle': 0,
+        #         'translate': (int(translate_x * bmode_tensor.shape[-1]), 
+        #                      int(translate_y * bmode_tensor.shape[-2])),
+        #         'scale': scale_factor,
+        #         'shear': 0
+        #     }
+            
+        #     bmode_tensor = T.functional.affine(bmode_tensor, 
+        #                                       interpolation=InterpolationMode.BILINEAR,
+        #                                       **affine_params)
+        #     needle_mask_tensor = T.functional.affine(needle_mask_tensor, 
+        #                                             interpolation=InterpolationMode.NEAREST,
+        #                                             **affine_params)
+        #     prostate_mask_tensor = T.functional.affine(prostate_mask_tensor, 
+        #                                               interpolation=InterpolationMode.NEAREST,
+        #                                               **affine_params)
+
+        # 1. GEOMETRIC AUGMENTATIONS (translation + scale + shear)
         if torch.rand(1).item() < geo_p:
             translate = self.aug_params['translate']
             scale = self.aug_params['scale']
-            
-            # Get random parameters
+            shear_range = self.aug_params.get('shear_range', (-5.0 , 5.0))
+
             scale_factor = torch.FloatTensor(1).uniform_(*scale).item()
             translate_x = torch.FloatTensor(1).uniform_(-translate[0], translate[0]).item()
             translate_y = torch.FloatTensor(1).uniform_(-translate[1], translate[1]).item()
-            
-            # Apply same affine transform to all tensors
+
+            # Shear in degrees (x and y independently)
+            shear_x = torch.FloatTensor(1).uniform_(*shear_range).item()
+            shear_y = torch.FloatTensor(1).uniform_(*shear_range).item()
+
             affine_params = {
-                'angle': 0,
-                'translate': (int(translate_x * bmode_tensor.shape[-1]), 
-                             int(translate_y * bmode_tensor.shape[-2])),
+                'angle': 0.0,
+                'translate': (
+                    int(translate_x * bmode_tensor.shape[-1]),
+                    int(translate_y * bmode_tensor.shape[-2])
+                ),
                 'scale': scale_factor,
-                'shear': 0
+                'shear': [shear_x, shear_y]
             }
-            
-            bmode_tensor = T.functional.affine(bmode_tensor, 
-                                              interpolation=InterpolationMode.BILINEAR,
-                                              **affine_params)
-            needle_mask_tensor = T.functional.affine(needle_mask_tensor, 
-                                                    interpolation=InterpolationMode.NEAREST,
-                                                    **affine_params)
-            prostate_mask_tensor = T.functional.affine(prostate_mask_tensor, 
-                                                      interpolation=InterpolationMode.NEAREST,
-                                                      **affine_params)
+
+            # Apply SAME affine to all tensors
+            bmode_tensor = T.functional.affine(
+                bmode_tensor,
+                interpolation=InterpolationMode.BILINEAR,
+                **affine_params
+            )
+
+            needle_mask_tensor = T.functional.affine(
+                needle_mask_tensor,
+                interpolation=InterpolationMode.NEAREST,
+                **affine_params
+            )
+
+            prostate_mask_tensor = T.functional.affine(
+                prostate_mask_tensor,
+                interpolation=InterpolationMode.NEAREST,
+                **affine_params
+            )
+
         
         # 2. INTENSITY AUGMENTATIONS (apply to image only)
         # Reduced frequency compared to original to preserve diagnostic features
@@ -401,7 +450,7 @@ class ProstateTransform:
             bmode_tensor = T.functional.adjust_sharpness(bmode_tensor, sharpness)
         
         # Random cutout/erasing (helps ProtoViT learn diverse prototypes)
-        if torch.rand(1).item() < self.aug_params['cutout_prob']:
+        if torch.rand(1).item() < cutout_p:
             bmode_tensor = self._apply_cutout(bmode_tensor, self.aug_params['cutout_size'])
         
         return bmode_tensor, needle_mask_tensor, prostate_mask_tensor

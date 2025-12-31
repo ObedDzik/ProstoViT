@@ -13,6 +13,7 @@ import wandb
 
 from helpers import makedir
 import model
+import dino_model
 import train_and_test_debug as tnt
 import save
 from log import create_logger
@@ -72,7 +73,8 @@ def main(cfg):
 
     # Construct the model
     arch = cfg.architecture.base_architecture
-    ppnet = model.construct_PPNet(
+    if arch == 'dinov3':
+        ppnet = dino_model.construct_PPNetDINO(
         base_architecture=cfg.architecture.base_architecture,
         pretrained=True, 
         img_size=cfg.architecture.img_size,
@@ -84,6 +86,20 @@ def main(cfg):
         add_on_layers_type=cfg.train.add_on_layers_type,
         layers= cfg.train.layers
     )
+
+    else:
+        ppnet = model.construct_PPNet(
+            base_architecture=cfg.architecture.base_architecture,
+            pretrained=True, 
+            img_size=cfg.architecture.img_size,
+            prototype_shape=tuple(cfg.architecture[arch].prototype_shape),
+            radius=cfg.architecture.radius,
+            num_classes=cfg.train.num_classes,
+            prototype_activation_function=cfg.train.prototype_activation_function,
+            sig_temp=cfg.train.sig_temp,
+            add_on_layers_type=cfg.train.add_on_layers_type,
+            layers= cfg.train.layers
+        )
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     log(str(device))
@@ -129,13 +145,15 @@ def main(cfg):
         log('epoch: \t{0}'.format(epoch))
 
         if epoch < cfg.train.num_warm_epochs:
-            # coefs['clst'] = 0.0
-            # coefs['sep'] = 0.0
-            # coefs['l1'] = 0.0         
-            # coefs['orth'] = 0.0      
-            # coefs['coh'] = 0.0 
-            ppnet.warmup = False
+            aug_strength = 0.6
+        elif epoch < cfg.train.num_warm_epochs + 10:
+            aug_strength = 0.8
+        else:
+            aug_strength = 1.0
+        train_dataset.set_aug_strength(aug_strength)
 
+        if epoch < cfg.train.num_warm_epochs:
+            ppnet.warmup = False
             tnt.warm_only(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
                 model=ppnet, 
