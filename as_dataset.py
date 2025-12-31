@@ -159,7 +159,7 @@ class ProstateDataset(Dataset):
 def get_datasets(*, cfg, **kwargs):
     cohort_mode = kwargs.get("cohort_selection_mode", getattr(cfg, "cohort_selection_mode", "splits_file"))
     augment = kwargs.get("augment", getattr(cfg, "augmentations", "none"))
-    augment_strength = cfg.get('augment_strength', 'medium')
+    augment_strength = cfg.get('augment_strength', 'light')
     return_raw_images = kwargs.get("return_raw_images", getattr(cfg, "return_raw_images", False))
     data_type = kwargs.get("data_type", getattr(cfg, "data_type", None))
     normalize = kwargs.get("normalize", getattr(cfg, "normalize", True))

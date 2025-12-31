@@ -302,29 +302,29 @@ class ProstateTransform:
         # 1. GEOMETRIC AUGMENTATIONS (apply to image and masks together)
         
         # Random horizontal flip
-        if torch.rand(1).item() < 0.5:
-            bmode_tensor = T.functional.hflip(bmode_tensor)
-            needle_mask_tensor = T.functional.hflip(needle_mask_tensor)
-            prostate_mask_tensor = T.functional.hflip(prostate_mask_tensor)
+        # if torch.rand(1).item() < 0.5:
+        #     bmode_tensor = T.functional.hflip(bmode_tensor)
+        #     needle_mask_tensor = T.functional.hflip(needle_mask_tensor)
+        #     prostate_mask_tensor = T.functional.hflip(prostate_mask_tensor)
         
-        # Random vertical flip
-        if torch.rand(1).item() < 0.5:
-            bmode_tensor = T.functional.vflip(bmode_tensor)
-            needle_mask_tensor = T.functional.vflip(needle_mask_tensor)
-            prostate_mask_tensor = T.functional.vflip(prostate_mask_tensor)
+        # # Random vertical flip
+        # if torch.rand(1).item() < 0.5:
+        #     bmode_tensor = T.functional.vflip(bmode_tensor)
+        #     needle_mask_tensor = T.functional.vflip(needle_mask_tensor)
+        #     prostate_mask_tensor = T.functional.vflip(prostate_mask_tensor)
         
         # Random rotation
-        if torch.rand(1).item() < geo_p:
-            angle = torch.FloatTensor(1).uniform_(
-                -self.aug_params['rotation_degrees'], 
-                self.aug_params['rotation_degrees']
-            ).item()
-            bmode_tensor = T.functional.rotate(bmode_tensor, angle, 
-                                              interpolation=InterpolationMode.BILINEAR)
-            needle_mask_tensor = T.functional.rotate(needle_mask_tensor, angle, 
-                                                    interpolation=InterpolationMode.NEAREST)
-            prostate_mask_tensor = T.functional.rotate(prostate_mask_tensor, angle, 
-                                                      interpolation=InterpolationMode.NEAREST)
+        # if torch.rand(1).item() < geo_p:
+        #     angle = torch.FloatTensor(1).uniform_(
+        #         -self.aug_params['rotation_degrees'], 
+        #         self.aug_params['rotation_degrees']
+        #     ).item()
+        #     bmode_tensor = T.functional.rotate(bmode_tensor, angle, 
+        #                                       interpolation=InterpolationMode.BILINEAR)
+        #     needle_mask_tensor = T.functional.rotate(needle_mask_tensor, angle, 
+        #                                             interpolation=InterpolationMode.NEAREST)
+        #     prostate_mask_tensor = T.functional.rotate(prostate_mask_tensor, angle, 
+        #                                               interpolation=InterpolationMode.NEAREST)
         
         # Random affine (translation + scale) - FIXED IMPLEMENTATION
         if torch.rand(1).item() < geo_p:
