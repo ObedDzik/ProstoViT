@@ -112,12 +112,13 @@ def main(cfg):
         {'params': ppnet.features.parameters(), 'lr': cfg.train.joint_optimizer_lrs['features'], 'weight_decay': 1e-3},
         {'params': ppnet.prototype_vectors, 'lr': cfg.train.joint_optimizer_lrs['prototype_vectors']},
     ]
+
     joint_optimizer = torch.optim.AdamW(joint_optimizer_specs)
     joint_lr_scheduler = torch.optim.lr_scheduler.StepLR(joint_optimizer, step_size=cfg.train.joint_lr_step_size, gamma=0.1)
 
     warm_optimizer_specs = [
         {'params': ppnet.features.parameters(), 'lr': cfg.train.warm_optimizer_lrs['features'], 'weight_decay': 1e-3},
-        {'params': ppnet.prototype_vectors, 'lr': cfg.train.warm_optimizer_lrs['prototype_vectors']},
+        {'params': ppnet.prototype_vectors, 'lr': cfg.train.warm_optimizer_lrs['prototype_vectors'],},
     ]
     warm_optimizer = torch.optim.AdamW(warm_optimizer_specs)
 
@@ -145,15 +146,16 @@ def main(cfg):
         log('epoch: \t{0}'.format(epoch))
 
         if epoch < cfg.train.num_warm_epochs:
-            aug_strength = 0.6
+            aug_strength = 1.0
         elif epoch < cfg.train.num_warm_epochs + 10:
-            aug_strength = 0.8
+            aug_strength = 1.0
         else:
             aug_strength = 1.0
         train_dataset.set_aug_strength(aug_strength)
 
         if epoch < cfg.train.num_warm_epochs:
             ppnet.warmup = False
+            ppnet.istraining = True
             tnt.warm_only(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
                 model=ppnet, 
@@ -181,6 +183,7 @@ def main(cfg):
         else:
             # coefs = cfg.train.coefs
             ppnet.warmup = False
+            ppnet.istraining = True
             tnt.joint(model=ppnet, log=log)
             train_acc, train_loss = tnt.train(
                 model=ppnet, 
@@ -205,7 +208,7 @@ def main(cfg):
             #             end = (c + 1) * ppnet.num_prototypes_per_class
             #             print(f"Class {c} proto mean:", proto_scores[start:end].mean().item())
             #         break 
-
+        ppnet.istraining = False
         accu, val_loss = tnt.test(
             model=ppnet, 
             dataloader=val_loader,

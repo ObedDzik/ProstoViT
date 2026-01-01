@@ -209,7 +209,7 @@ class ProstateTransform:
         self.grade_group_for_positive_label = grade_group_for_positive_label
         self.flip_ud = flip_ud
         self.augment_strength = augment_strength
-        self.aug_strength = 0.5
+        self.aug_strength = 1.0
         
         # Define augmentation parameters based on strength
         self._set_augment_params()

@@ -20,7 +20,7 @@ class PPNet(nn.Module):
                  sig_temp = 1.0,
                  radius = 3,
                  add_on_layers_type='bottleneck',
-                 layers=None):
+                 layers=None,):
 
         super(PPNet, self).__init__()
         self.img_size = img_size
@@ -32,6 +32,8 @@ class PPNet(nn.Module):
         self.normalizer = nn.Softmax(dim=1)
         self.layers = layers
         self.warmup=False
+        self.prototype_dropout = nn.Dropout(p=0.3)
+        self.istraining = False
         # prototype_activation_function could be 'log', 'linear',
         # or a generic function that converts distance to similarity score
         
@@ -452,6 +454,8 @@ class PPNet(nn.Module):
         
     def forward(self, x):
         max_activation, min_distances, values = self.greedy_distance(x)
+        if self.istraining:
+            max_activation = self.prototype_dropout(max_activation)
         logits = self.last_layer(max_activation)
 
         # if self.warmup: #debug

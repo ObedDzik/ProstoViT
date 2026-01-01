@@ -4,3 +4,4 @@ rough.ipynb
 tools/__pycache__
 logs
 wandb
+kfold_primus_splits.json

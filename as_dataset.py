@@ -90,6 +90,19 @@ class ProstateDataset(Dataset):
                 }
             )
 
+        self.metadata = [
+            {
+                "primus": d["info"]["PRI-MUS"],
+                "diagnosis": d["info"]["Diagnosis"],
+                "grade_group": d["info"]["GG"],
+                "center": d["info"]["center"],
+                "pct_cancer": d["info"]["% Cancer"],
+                "inv": d["info"]["P Inv"],
+            }
+            for d in self.data
+        ]
+
+
     def __len__(self):
         return len(self.data)
 
@@ -157,6 +170,9 @@ class ProstateDataset(Dataset):
     
     def set_aug_strength(self, strength):
         self.transform.set_aug_strength(strength)
+
+    def get_metadata(self):
+        return self.metadata
 
 
 def get_datasets(*, cfg, **kwargs):
