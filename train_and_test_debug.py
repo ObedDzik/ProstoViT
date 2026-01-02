@@ -18,12 +18,15 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     n_correct = 0
     n_batches = 0
     total_cross_entropy = 0
+    total_focal_loss = 0
     total_cluster_cost = 0
     total_separation_cost = 0
     total_avg_separation_cost = 0
     total_orth_loss = 0
     total_coherence_loss = 0
     total_loss = 0
+    alpha = torch.tensor([1.0,0.5,1.5,2.0,1.5]).cuda()
+    gamma = 2.0
     
     for i, data in enumerate(dataloader):
         image, label = data['bmode'], data['primus_label']
@@ -34,7 +37,11 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
         with grad_req:
             output, min_distances, values = model(input)
-            cross_entropy = torch.nn.functional.cross_entropy(output, target)
+            # cross_entropy = torch.nn.functional.cross_entropy(output, target)
+            logpt = -F.cross_entropy(output, target, reduction='none', weight=alpha)
+            pt = logpt.exp()
+            focal_loss = -((1-pt)**gamma)*logpt
+            focal_loss = focal_loss.mean()
 
             if class_specific:
                 # Get prototypes of correct class
@@ -180,7 +187,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             n_examples += target.size(0)
             n_correct += (predicted == target).sum().item()
             n_batches += 1
-            total_cross_entropy += cross_entropy.item()
+            # total_cross_entropy += cross_entropy.item()
+            total_focal_loss += focal_loss.item()
             total_cluster_cost += cluster_cost.item()
             total_separation_cost += separation_cost.item()
             total_avg_separation_cost += avg_separation_cost.item()
@@ -198,7 +206,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             if class_specific:
                 if coefs is not None:
                     loss = (
-                        coefs['crs_ent'] * cross_entropy
+                        # coefs['crs_ent'] * cross_entropy
+                        coefs['fcl'] * focal_loss
                         + coefs['clst'] * cluster_cost
                         + coefs['sep'] * separation_cost
                         + coefs['l1'] * l1
@@ -207,16 +216,17 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
                     )
                     total_loss += loss.item()
                 else:
-                    loss = cross_entropy + 0.8 * cluster_cost - 0.08 * separation_cost + 1e-4 * l1
+                    loss = focal_loss + 0.8 * cluster_cost - 0.08 * separation_cost + 1e-4 * l1 # cross_entropy + 0.8 * cluster_cost - 0.08 * separation_cost + 1e-4 * l1
             else:
                 if coefs is not None:
                     loss = (
-                        coefs['crs_ent'] * cross_entropy
+                        # coefs['crs_ent'] * cross_entropy
+                        coefs['fcl'] * focal_loss
                         + coefs['clst'] * cluster_cost
                         + coefs['l1'] * l1
                     )
                 else:
-                    loss = cross_entropy + 0.8 * cluster_cost + 1e-4 * l1
+                    loss = focal_loss + 0.8 * cluster_cost + 1e-4 * l1 #cross_entropy + 0.8 * cluster_cost + 1e-4 * l1
             
             optimizer.zero_grad()
             loss.backward()
@@ -241,7 +251,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     if is_train:
         log('\ttotal loss: \t{0:.4f}'.format(total_loss / n_batches))
     
-    log('\tcross ent: \t{0:.4f}'.format(total_cross_entropy / n_batches))
+    # log('\tcross ent: \t{0:.4f}'.format(total_cross_entropy / n_batches))
+    log('\tfocal loss: \t{0}'.format(total_focal_loss / n_batches))
     log('\tcluster: \t{0:.4f}'.format(total_cluster_cost / n_batches))
     
     if class_specific:
@@ -269,7 +280,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     # Return loss values as dictionary
     if is_train:
         loss_values = {
-            "cross entropy Loss": coefs['crs_ent'] * total_cross_entropy / n_batches,
+            # "cross entropy Loss": coefs['crs_ent'] * total_cross_entropy / n_batches,
+            "focal loss": coefs['fcl'] * total_focal_loss / n_batches,
             "clst loss": coefs['clst'] *  total_cluster_cost / n_batches,
             "sep loss": coefs['sep'] * total_separation_cost / n_batches,
             "avg separation_cost": total_avg_separation_cost / n_batches,
@@ -281,7 +293,8 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
         }
     else:
         loss_values = {
-            "cross entropy Loss": total_cross_entropy / n_batches,
+            # "cross entropy Loss": total_cross_entropy / n_batches,
+            "focal loss": total_focal_loss / n_batches,
             "clst loss": total_cluster_cost / n_batches,
             "sep loss": total_separation_cost / n_batches,
             "avg separation_cost": total_avg_separation_cost / n_batches,

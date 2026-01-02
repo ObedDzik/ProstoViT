@@ -159,6 +159,7 @@ class ProstateDataset(Dataset):
 
         class_count = np.bincount(labels)
         class_weights = 1.0/class_count
+        class_weights[1]*=0.4
         sample_weights = class_weights[labels]
 
         sampler = WeightedRandomSampler(
