@@ -3,6 +3,7 @@ import torch
 from tqdm import tqdm
 from helpers import list_of_distances, make_one_hot
 import torch.nn.functional as F
+from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix
 
 
 def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l1_mask=True,
@@ -25,8 +26,10 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     total_orth_loss = 0
     total_coherence_loss = 0
     total_loss = 0
-    alpha = torch.tensor([1.0,0.5,1.5,2.0,1.5]).cuda()
+    alpha = torch.tensor([0.5,0.25,1.5,2.0,2.0]).cuda()
     gamma = 2.0
+    all_preds=[]
+    all_targets=[]
     
     for i, data in enumerate(dataloader):
         image, label = data['bmode'], data['primus_label']
@@ -37,11 +40,12 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
         with grad_req:
             output, min_distances, values = model(input)
-            # cross_entropy = torch.nn.functional.cross_entropy(output, target)
-            logpt = -F.cross_entropy(output, target, reduction='none', weight=alpha)
-            pt = logpt.exp()
-            focal_loss = -((1-pt)**gamma)*logpt
-            focal_loss = focal_loss.mean()
+            cross_entropy = torch.nn.functional.cross_entropy(output, target)
+            # logpt = -F.cross_entropy(output, target, reduction='none', weight=alpha)
+            # pt = logpt.exp()
+            # focal_loss = -((1-pt)**gamma)*logpt
+            # focal_loss = focal_loss.mean()
+            focal_loss = cross_entropy
 
             if class_specific:
                 # Get prototypes of correct class
@@ -187,6 +191,9 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             n_examples += target.size(0)
             n_correct += (predicted == target).sum().item()
             n_batches += 1
+            #debug
+            all_preds.append(predicted.cpu())
+            all_targets.append(target.cpu())
             # total_cross_entropy += cross_entropy.item()
             total_focal_loss += focal_loss.item()
             total_cluster_cost += cluster_cost.item()
@@ -243,6 +250,12 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
 
     end = time.time()
 
+    all_preds = torch.cat(all_preds)
+    all_targets = torch.cat(all_targets)
+    accuracy = (all_preds == all_targets).float().mean().item()
+    f1_macro = f1_score(all_targets.numpy(), all_preds.numpy(), average='macro', zero_division=0)
+    f1_weighted = f1_score(all_targets.numpy(), all_preds.numpy(), average='weighted', zero_division=0)
+
     # =====================================================
     # LOGGING
     # =====================================================
@@ -270,6 +283,9 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             log('\tEstimated avg slots value: \t{0:.4f}'.format(avg_slots.item()))
     
     log('\taccuracy: \t{0:.2f}%'.format(n_correct / n_examples * 100))
+    log('\tmy_acc: \t{0:.2f}%'.format(accuracy))
+    log('\tf1_macro: \t{0:.2f}%'.format(f1_macro))
+    log('\tf1_weighted: \t{0:.2f}%'.format(f1_weighted))
     
     # Compute prototype diversity
     p = model.prototype_vectors.view(model.num_prototypes, -1).cpu()
@@ -289,7 +305,10 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             "orth loss": coefs['orth'] *  total_orth_loss / n_batches,
             "coherence loss": coefs['coh'] * total_coherence_loss / n_batches,
             "total loss": total_loss/ n_batches,
-            "acc": n_correct / n_examples * 100
+            "acc": n_correct / n_examples * 100,
+            "my_acc": accuracy,
+            "f1_macro": f1_macro,
+            "f1_weighted": f1_weighted
         }
     else:
         loss_values = {
@@ -301,7 +320,10 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
             "l1 loss": model.last_layer.weight.norm(p=1).item(),
             "orth loss": total_orth_loss / n_batches,
             "coherence loss": total_coherence_loss / n_batches,
-            "acc": n_correct / n_examples * 100
+            "acc": n_correct / n_examples * 100,
+            "my_acc": accuracy,
+            "f1_macro": f1_macro,
+            "f1_weighted": f1_weighted
         }
 
 

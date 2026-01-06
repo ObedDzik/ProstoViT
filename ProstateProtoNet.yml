@@ -1,6 +1,6 @@
 ################### Experiment information ######################
 description: ProstateProtoViT model
-run_name: "ProstateProtoViT_deit_newsplit_focalloss"
+run_name: "ProstateProtoViT_deit_loader_fixed_UAonly"
 wandb_mode: 'online'
 abstain_class: True
 base_dir: /scratch/obed
@@ -47,7 +47,7 @@ train:
   sum_cls: False
   k: 1
   sig_temp: 100
-  num_joint_epochs: 90
+  num_joint_epochs: 30
   num_warm_epochs: 5
   num_finetune_epochs: 15
   slots_train_epoch: 10
@@ -56,13 +56,14 @@ train:
 
 data:
   fold: ${fold}
+  UA_only: False
   n_folds: 5
   test_center: null
   exclude_benign_cores_from_positive_patients: true
   involvement_threshold_pct: null
   undersample_benign_ratio: null
   cohort_selection_mode: splits_file
-  splits_file: "/home/obed/projects/aip-medilab/obed/medproj/ProstoViT/kfold_primus_splits.json" #"/datasets/exactvu_pca/OPTIMUM/processed/processed/UA_annotated_needles/splits.json"
+  splits_file: "/datasets/exactvu_pca/OPTIMUM/processed/processed/UA_annotated_needles/splits.json" #"/home/obed/projects/aip-medilab/obed/medproj/ProstoViT/kfold_primus_splits.json" #"/datasets/exactvu_pca/OPTIMUM/processed/processed/UA_annotated_needles/splits.json"
   dataset: default
   batch_size: 64
   num_workers: 16
@@ -81,7 +82,7 @@ data:
   rf_as_bmode: false
   include_rf: false
   return_raw_images: False
-  data_path: "/datasets/exactvu_pca/OPTIMUM/UA_OL_PU_annotated_needles_multiframe"
+  data_path: "/datasets/exactvu_pca/OPTIMUM/processed/processed" #"/datasets/exactvu_pca/OPTIMUM/UA_OL_PU_annotated_needles_multiframe"
 
 wandb:
   name: ${run_name}_fold${data.fold}

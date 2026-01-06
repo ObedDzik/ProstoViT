@@ -15,6 +15,7 @@ from helpers import makedir
 import model
 import dino_model
 import train_and_test_debug as tnt
+from collections import Counter
 import save
 from log import create_logger
 from preprocess import mean, std, preprocess_input_function
@@ -23,7 +24,7 @@ from timm.models import create_model
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.scheduler import CosineLRScheduler
 from timm.utils import NativeScaler, get_state_dict, ModelEma
-from as_dataset import get_datasets
+from as_dataset import get_datasets, BalancedBatchSampler
 from as_dataloader import make_loader
 from omegaconf import OmegaConf
 
@@ -61,7 +62,14 @@ def main(cfg):
 
     # Load datasets
     train_dataset, val_dataset = get_datasets(cfg=cfg.data)
-    train_loader = make_loader(dataset=train_dataset, cfg=cfg.data, shuffle=False, weighted=True, pin_memory=True, drop_last=True)
+
+    balanced_sampler = BalancedBatchSampler(
+        train_dataset, 
+        batch_size=cfg.data.batch_size,
+        num_classes=cfg.train.num_classes
+    )
+
+    train_loader = make_loader(dataset=train_dataset, cfg=cfg.data, shuffle=False, weighted=True, pin_memory=True, drop_last=True, batch_sampler=balanced_sampler)
     val_loader = make_loader(dataset=val_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)
     train_push_dataset = get_datasets(cfg=cfg.data, augment='none', data_type='push', normalize=False)
     train_push_loader = make_loader(dataset=train_push_dataset, cfg=cfg.data, shuffle=False, weighted=False, pin_memory=False)  # Changed: weighted=False for push
@@ -70,6 +78,20 @@ def main(cfg):
     log('push set size: {0}'.format(len(train_push_loader.dataset)))
     log('val set size: {0}'.format(len(val_loader.dataset)))
     log('batch size: {0}'.format(cfg.data.batch_size))
+
+    print("\n2. Checking balanced sampler (first 5 batches):")
+    for batch_idx, data in enumerate(train_loader):
+        y = data['primus_label']
+        if torch.is_tensor(y):
+            y = y.tolist()
+        else:
+            y = [y] if not isinstance(y, list) else y
+        
+        counts = Counter(y)
+        print(f"   Batch {batch_idx}: {dict(counts)}")
+        
+        if batch_idx >= 5:
+            break
 
     # Construct the model
     arch = cfg.architecture.base_architecture
@@ -233,6 +255,9 @@ def main(cfg):
             "epoch": epoch,
             "phase": phase,
             "train/accuracy": train_loss["acc"],
+            # "train/my_acc": train_loss["my_acc"],
+            "train/f1_macro": train_loss["f1_macro"],
+            "train/f1_weighted": train_loss["f1_weighted"],
             # "train/cross_entropy": train_loss["cross entropy Loss"],
             "train/focal_loss": train_loss["focal loss"],
             "train/cluster_loss": train_loss["clst loss"],
@@ -249,6 +274,8 @@ def main(cfg):
             "val/orthogonal loss": coefs['orth']*val_loss["orth loss"],
             "val/coherence loss": coefs['coh']*val_loss.get("coherence loss", 0),
             "val/accuracy": val_loss["acc"],
+            "val/f1_macro": val_loss["f1_macro"],
+            "val/f1_weighted": val_loss["f1_weighted"],
             "accuracy": accu,
             "learning_rate": current_lr,
             "best_accuracy": best_accu,
@@ -272,119 +299,123 @@ def main(cfg):
     # =====================================================
     # STAGE 3: SLOTS PRUNING
     # =====================================================
-    # log('=' * 60)
-    # log('STAGE 3: SLOTS PRUNING')
-    # log('=' * 60)
+    log('=' * 60)
+    log('STAGE 3: SLOTS PRUNING')
+    log('=' * 60)
 
-    # # Create optimizer for slots training (only now, not at the beginning)
-    # slots_optimizer_specs = [{'params': ppnet.patch_select, 'lr': cfg.train.stage_2_lrs['patch_select']}]
-    # slots_optimizer = torch.optim.AdamW(slots_optimizer_specs)
-    # slots_lr_scheduler = torch.optim.lr_scheduler.StepLR(slots_optimizer, step_size=cfg.train.joint_lr_step_size, gamma=0.1)
+    # Create optimizer for slots training (only now, not at the beginning)
+    slots_optimizer_specs = [{'params': ppnet.patch_select, 'lr': cfg.train.stage_2_lrs['patch_select']}]
+    slots_optimizer = torch.optim.AdamW(slots_optimizer_specs)
+    slots_lr_scheduler = torch.optim.lr_scheduler.StepLR(slots_optimizer, step_size=cfg.train.joint_lr_step_size, gamma=0.1)
 
-    # # Update coherence loss coefficient for slots pruning
-    # coefs['coh'] = cfg.train.coefs_slots['coh']
-    # log(f'Coefs for slots training: {coefs}')
+    # Update coherence loss coefficient for slots pruning
+    coefs['coh'] = cfg.train.coefs_slots['coh']
+    log(f'Coefs for slots training: {coefs}')
 
-    # # Log initial slot statistics
-    # with torch.no_grad():
-    #     initial_slots = torch.sigmoid(ppnet.patch_select * ppnet.temp)
-    #     initial_active = (initial_slots > 0.5).sum().item()
-    #     total_slots = ppnet.patch_select.numel()
-    #     log(f'Initial active slots: {initial_active}/{total_slots} ({100*initial_active/total_slots:.1f}%)')
+    # Log initial slot statistics
+    with torch.no_grad():
+        initial_slots = torch.sigmoid(ppnet.patch_select * ppnet.temp)
+        initial_active = (initial_slots > 0.5).sum().item()
+        total_slots = ppnet.patch_select.numel()
+        log(f'Initial active slots: {initial_active}/{total_slots} ({100*initial_active/total_slots:.1f}%)')
 
-    # for epoch in range(cfg.train.slots_train_epoch):
-    #     tnt.joint(model=ppnet, log=log)  # All parameters trainable, but optimizer only updates patch_select
-    #     log('slots epoch: \t{0}'.format(epoch))
+    for epoch in range(cfg.train.slots_train_epoch):
+        tnt.joint(model=ppnet, log=log)  # All parameters trainable, but optimizer only updates patch_select
+        log('slots epoch: \t{0}'.format(epoch))
         
-    #     train_acc, train_loss = tnt.train(
-    #         model=ppnet, 
-    #         dataloader=train_loader, 
-    #         optimizer=slots_optimizer,
-    #         class_specific=class_specific, 
-    #         coefs=coefs, 
-    #         log=log, 
-    #         ema=model_ema, 
-    #         clst_k=cfg.train.k, 
-    #         sum_cls=cfg.train.sum_cls
-    #     )
-    #     slots_lr_scheduler.step()
+        train_acc, train_loss = tnt.train(
+            model=ppnet, 
+            dataloader=train_loader, 
+            optimizer=slots_optimizer,
+            class_specific=class_specific, 
+            coefs=coefs, 
+            log=log, 
+            ema=model_ema, 
+            clst_k=cfg.train.k, 
+            sum_cls=cfg.train.sum_cls
+        )
+        slots_lr_scheduler.step()
         
-    #     accu, val_loss = tnt.test(
-    #         model=ppnet, 
-    #         dataloader=val_loader,
-    #         class_specific=class_specific, 
-    #         log=log, 
-    #         clst_k=cfg.train.k, 
-    #         sum_cls=cfg.train.sum_cls
-    #     )
+        accu, val_loss = tnt.test(
+            model=ppnet, 
+            dataloader=val_loader,
+            class_specific=class_specific, 
+            log=log, 
+            clst_k=cfg.train.k, 
+            sum_cls=cfg.train.sum_cls
+        )
 
-    #     # Log slot statistics
-    #     with torch.no_grad():
-    #         current_slots = torch.sigmoid(ppnet.patch_select * ppnet.temp)
-    #         current_active = (current_slots > 0.5).sum().item()
+        # Log slot statistics
+        with torch.no_grad():
+            current_slots = torch.sigmoid(ppnet.patch_select * ppnet.temp)
+            current_active = (current_slots > 0.5).sum().item()
             
-    #     wandb.log({
-    #         "epoch": num_train_epochs + epoch,
-    #         "phase": "slots",
-    #         "train/accuracy": train_loss["acc"],
-    #         "train/cross_entropy": train_loss["cross entropy Loss"],
-            # "train/focal_loss": train_loss["focal loss"],
-    #         "train/cluster_loss": train_loss["clst loss"],
-    #         "train/separation_loss": train_loss["sep loss"],
-    #         "train/orthogonal_loss": train_loss["orth loss"],
-    #         "train/coherence_loss": train_loss.get("coherence loss", 0),
-    #         "train/l1_loss": train_loss["l1 loss"],
-    #         "train/total loss": train_loss["total loss"],
-    #         "val/cross entropy Loss": coefs['crs_ent']*val_loss["cross entropy Loss"],
-            # "val/focal loss": coefs['fcl']*val_loss["focal loss"],
-    #         "val/cluster loss": coefs['clst']*val_loss["clst loss"],
-    #         "val/separation loss": coefs['sep']*val_loss["sep loss"],
-    #         "val/l1 loss": coefs['l1']*val_loss["l1 loss"],
-    #         "val/orthogonal loss": coefs['orth']*val_loss["orth loss"],
-    #         "val/coherence loss": coefs['coh']*val_loss.get("coherence loss", 0),
-    #         "val/accuracy": val_loss["acc"],
-    #         "accuracy": accu,
-    #         "slots/num_active": current_active,
-    #         "slots/percentage_active": 100 * current_active / total_slots,
-    #     })
+        wandb.log({
+            "epoch": num_train_epochs + epoch,
+            "phase": "slots",
+            "train/accuracy": train_loss["acc"],
+            "train/f1_macro": train_loss["f1_macro"],
+            "train/f1_weighted": train_loss["f1_weighted"],
+            "train/cross_entropy": train_loss["cross entropy Loss"],
+            "train/focal_loss": train_loss["focal loss"],
+            "train/cluster_loss": train_loss["clst loss"],
+            "train/separation_loss": train_loss["sep loss"],
+            "train/orthogonal_loss": train_loss["orth loss"],
+            "train/coherence_loss": train_loss.get("coherence loss", 0),
+            "train/l1_loss": train_loss["l1 loss"],
+            "train/total loss": train_loss["total loss"],
+            "val/cross entropy Loss": coefs['crs_ent']*val_loss["cross entropy Loss"],
+            "val/focal loss": coefs['fcl']*val_loss["focal loss"],
+            "val/cluster loss": coefs['clst']*val_loss["clst loss"],
+            "val/separation loss": coefs['sep']*val_loss["sep loss"],
+            "val/l1 loss": coefs['l1']*val_loss["l1 loss"],
+            "val/orthogonal loss": coefs['orth']*val_loss["orth loss"],
+            "val/coherence loss": coefs['coh']*val_loss.get("coherence loss", 0),
+            "val/accuracy": val_loss["acc"],
+            "val/f1_macro": val_loss["f1_macro"],
+            "val/f1_weighted": val_loss["f1_weighted"],
+            "accuracy": accu,
+            "slots/num_active": current_active,
+            "slots/percentage_active": 100 * current_active / total_slots,
+        })
         
-    #     save.save_model_w_condition(
-    #         model=ppnet, 
-    #         model_dir=model_dir, 
-    #         model_name=str(epoch) + 'slots', 
-    #         accu=accu,
-    #         target_accu=0.75, 
-    #         log=log
-    #     )
+        save.save_model_w_condition(
+            model=ppnet, 
+            model_dir=model_dir, 
+            model_name=str(epoch) + 'slots', 
+            accu=accu,
+            target_accu=0.75, 
+            log=log
+        )
 
-    # # Round slot indicators to binary values
-    # log('=' * 60)
-    # log('Rounding slot indicators to binary values')
-    # log('=' * 60)
+    # Round slot indicators to binary values
+    log('=' * 60)
+    log('Rounding slot indicators to binary values')
+    log('=' * 60)
     
-    # with torch.no_grad():
-    #     slots_before_rounding = torch.sigmoid(ppnet.patch_select * ppnet.temp)
-    #     active_before = (slots_before_rounding > 0.5).sum().item()
+    with torch.no_grad():
+        slots_before_rounding = torch.sigmoid(ppnet.patch_select * ppnet.temp)
+        active_before = (slots_before_rounding > 0.5).sum().item()
         
-    #     # Round to binary
-    #     ppnet.patch_select.data = torch.round(slots_before_rounding)
+        # Round to binary
+        ppnet.patch_select.data = torch.round(slots_before_rounding)
         
-    #     active_after = (ppnet.patch_select > 0.5).sum().item()
-    #     pruned = active_before - active_after
+        active_after = (ppnet.patch_select > 0.5).sum().item()
+        pruned = active_before - active_after
         
-    # log(f'Slots before rounding: {active_before}/{total_slots} ({100*active_before/total_slots:.1f}%)')
-    # log(f'Slots after rounding: {active_after}/{total_slots} ({100*active_after/total_slots:.1f}%)')
-    # log(f'Slots pruned: {pruned}')
+    log(f'Slots before rounding: {active_before}/{total_slots} ({100*active_before/total_slots:.1f}%)')
+    log(f'Slots after rounding: {active_after}/{total_slots} ({100*active_after/total_slots:.1f}%)')
+    log(f'Slots pruned: {pruned}')
     
-    # wandb.log({
-    #     "slots/final_active": active_after,
-    #     "slots/final_percentage": 100 * active_after / total_slots,
-    #     "slots/num_pruned": pruned,
-    # })
+    wandb.log({
+        "slots/final_active": active_after,
+        "slots/final_percentage": 100 * active_after / total_slots,
+        "slots/num_pruned": pruned,
+    })
 
-    # # Freeze slot indicators
-    # ppnet.patch_select.requires_grad = False
-    # log('Slot indicators frozen')
+    # Freeze slot indicators
+    ppnet.patch_select.requires_grad = False
+    log('Slot indicators frozen')
 
     # =====================================================
     # STAGE 4: PROTOTYPE PROJECTION
@@ -431,68 +462,72 @@ def main(cfg):
     # =====================================================
     # STAGE 5: LAST LAYER OPTIMIZATION
     # =====================================================
-    # log('=' * 60)
-    # log('STAGE 5: LAST LAYER OPTIMIZATION')
-    # log('=' * 60)
+    log('=' * 60)
+    log('STAGE 5: LAST LAYER OPTIMIZATION')
+    log('=' * 60)
 
-    # num_finetune_epochs = cfg.train.get('num_finetune_epochs', 15)  # Get from config, default to 15
+    num_finetune_epochs = cfg.train.get('num_finetune_epochs', 15)  # Get from config, default to 15
     
-    # for epoch in range(num_finetune_epochs):
-    #     tnt.last_only(model=ppnet, log=log)
-    #     log('finetune iteration: \t{0}'.format(epoch))
+    for epoch in range(num_finetune_epochs):
+        tnt.last_only(model=ppnet, log=log)
+        log('finetune iteration: \t{0}'.format(epoch))
         
-    #     train_acc, train_loss = tnt.train(
-    #         model=ppnet, 
-    #         dataloader=train_loader, 
-    #         optimizer=last_layer_optimizer,
-    #         class_specific=class_specific, 
-    #         coefs=coefs, 
-    #         log=log, 
-    #         ema=model_ema, 
-    #         clst_k=cfg.train.k, 
-    #         sum_cls=cfg.train.sum_cls
-    #     )
+        train_acc, train_loss = tnt.train(
+            model=ppnet, 
+            dataloader=train_loader, 
+            optimizer=last_layer_optimizer,
+            class_specific=class_specific, 
+            coefs=coefs, 
+            log=log, 
+            ema=model_ema, 
+            clst_k=cfg.train.k, 
+            sum_cls=cfg.train.sum_cls
+        )
         
-    #     accu, val_loss = tnt.test(
-    #         model=ppnet, 
-    #         dataloader=val_loader,
-    #         class_specific=class_specific, 
-    #         log=log, 
-    #         clst_k=cfg.train.k,
-    #         sum_cls=cfg.train.sum_cls
-    #     )
+        accu, val_loss = tnt.test(
+            model=ppnet, 
+            dataloader=val_loader,
+            class_specific=class_specific, 
+            log=log, 
+            clst_k=cfg.train.k,
+            sum_cls=cfg.train.sum_cls
+        )
         
-    #     wandb.log({
-    #         "epoch": num_train_epochs + cfg.train.slots_train_epoch + epoch,
-    #         "phase": "finetune",
-    #         "train/accuracy": train_loss["acc"],
-    #         "train/cross_entropy": train_loss["cross entropy Loss"],
-            # "train/focal_loss": train_loss["focal loss"],
-    #         "train/cluster_loss": train_loss["clst loss"],
-    #         "train/separation_loss": train_loss["sep loss"],
-    #         "train/orthogonal_loss": train_loss["orth loss"],
-    #         "train/coherence_loss": train_loss.get("coherence loss", 0),
-    #         "train/l1_loss": train_loss["l1 loss"],
-    #         "train/total loss": train_loss["total loss"],
-    #         "val/cross entropy Loss": coefs['crs_ent']*val_loss["cross entropy Loss"],
-            # "val/focal loss": coefs['fcl']*val_loss["focal loss"],
-    #         "val/cluster loss": coefs['clst']*val_loss["clst loss"],
-    #         "val/separation loss": coefs['sep']*val_loss["sep loss"],
-    #         "val/l1 loss": coefs['l1']*val_loss["l1 loss"],
-    #         "val/orthogonal loss": coefs['orth']*val_loss["orth loss"],
-    #         "val/coherence loss": coefs['coh']*val_loss.get("coherence loss", 0),
-    #         "val/accuracy": val_loss["acc"],
-    #         "accuracy": accu,
-    #     })
+        wandb.log({
+            "epoch": num_train_epochs + cfg.train.slots_train_epoch + epoch,
+            "phase": "finetune",
+            "train/accuracy": train_loss["acc"],
+            "train/f1_macro": train_loss["f1_macro"],
+            "train/f1_weighted": train_loss["f1_weighted"],
+            "train/cross_entropy": train_loss["cross entropy Loss"],
+            "train/focal_loss": train_loss["focal loss"],
+            "train/cluster_loss": train_loss["clst loss"],
+            "train/separation_loss": train_loss["sep loss"],
+            "train/orthogonal_loss": train_loss["orth loss"],
+            "train/coherence_loss": train_loss.get("coherence loss", 0),
+            "train/l1_loss": train_loss["l1 loss"],
+            "train/total loss": train_loss["total loss"],
+            "val/cross entropy Loss": coefs['crs_ent']*val_loss["cross entropy Loss"],
+            "val/focal loss": coefs['fcl']*val_loss["focal loss"],
+            "val/cluster loss": coefs['clst']*val_loss["clst loss"],
+            "val/separation loss": coefs['sep']*val_loss["sep loss"],
+            "val/l1 loss": coefs['l1']*val_loss["l1 loss"],
+            "val/orthogonal loss": coefs['orth']*val_loss["orth loss"],
+            "val/coherence loss": coefs['coh']*val_loss.get("coherence loss", 0),
+            "val/accuracy": val_loss["acc"],
+            "val/f1_macro": val_loss["f1_macro"],
+            "val/f1_weighted": val_loss["f1_weighted"],
+            "accuracy": accu,
+        })
         
-    #     save.save_model_w_condition(
-    #         model=ppnet, 
-    #         model_dir=model_dir, 
-    #         model_name=str(epoch) + 'finetuned', 
-    #         accu=accu,
-    #         target_accu=0.70, 
-    #         log=log
-    #     )
+        save.save_model_w_condition(
+            model=ppnet, 
+            model_dir=model_dir, 
+            model_name=str(epoch) + 'finetuned', 
+            accu=accu,
+            target_accu=0.70, 
+            log=log
+        )
 
     log('=' * 60)
     log('TRAINING COMPLETE')

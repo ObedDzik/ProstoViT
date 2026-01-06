@@ -9,6 +9,9 @@ import pandas as pd
 from prostate_transform import ProstateTransform
 import os
 import sklearn.model_selection
+from torch.utils.data import BatchSampler
+import numpy as np
+import torch
 
 def strip_padding_pil(img: Image.Image) -> Image.Image:
     """
@@ -47,32 +50,48 @@ class ProstateDataset(Dataset):
         out_fmt: Literal["pil", "np"] = "pil",
         strip_padding=False,
         tqdm_kw=None,
+        UA_only=False,
     ):
         self.root_dir = Path(root_dir)
         self.transform = transform
         self.out_fmt = out_fmt
         self.strip_padding = strip_padding
         self.tqdm_kw = tqdm_kw or {}
+        self._label_indices = None
+        self.UA_only = UA_only
 
         self.case_ids = set(case_ids) if case_ids is not None else None
         self.data = []
-        frame_paths = sorted(self.root_dir.rglob("frames/*.png"))
+        # frame_paths = sorted(self.root_dir.rglob("frames/*.png"))
+        frame_paths = sorted(self.root_dir.rglob("image.png"))
 
         for frame_path in tqdm(frame_paths, desc="Indexing frames", **self.tqdm_kw):
             frame_path = Path(frame_path)
-
-            try:
-                center, case, _, _ = frame_path.relative_to(self.root_dir).parts
-            except ValueError:
+            if self.UA_only:
+                try:
+                    rel_parent, center, case, _ = frame_path.relative_to(self.root_dir).parts
+                except ValueError:
                 # Unexpected directory depth
-                continue
+                    continue
+            else:
+                try:
+                    center, case, _, _ = frame_path.relative_to(self.root_dir).parts
+                except ValueError:
+                    # Unexpected directory depth
+                    continue
 
             if self.case_ids is not None and center not in self.case_ids:
                 continue
+            
+            if self.UA_only:
+                case_dir = self.root_dir / rel_parent / center / case
+                info_path = case_dir / "info.json"
+                needle_mask_path = case_dir / needle_mask_fname
 
-            case_dir = self.root_dir / center / case
-            info_path = case_dir / "info.json"
-            needle_mask_path = case_dir / needle_mask_fname
+            else:
+                case_dir = self.root_dir / center / case
+                info_path = case_dir / "info.json"
+                needle_mask_path = case_dir / needle_mask_fname
 
             if not info_path.exists():
                 continue
@@ -146,25 +165,46 @@ class ProstateDataset(Dataset):
         return outputs
 
     def get_weighted_sampler(self):
+        from collections import Counter
+        
         labels = []
-
         for item in self.data:
             primus_score = item["info"]["PRI-MUS"]
             try:
                 primus_val = int(float(primus_score))
             except (TypeError, ValueError):
                 primus_val = 1
-            labels.append(primus_val-1)
+            labels.append(primus_val - 1)  # Convert 1-5 to 0-4
+        
         labels = np.array(labels)
-
-        class_count = np.bincount(labels)
-        class_weights = 1.0/class_count
-        class_weights[1]*=0.4
-        sample_weights = class_weights[labels]
-
+        
+        # Use Counter - handles missing classes gracefully
+        label_counts = Counter(labels)
+        print(f"Class distribution: {dict(sorted(label_counts.items()))}")
+        
+        # Compute weights - only for classes that exist
+        num_samples = len(labels)
+        class_weights = {}
+        for c in range(5):
+            if c in label_counts:
+                class_weights[c] = num_samples / label_counts[c]
+            else:
+                class_weights[c] = 0.0  # No samples = no weight
+        
+        print(f"Class weights: {class_weights}")
+        
+        # Assign weight to each sample
+        sample_weights = np.array([class_weights[label] for label in labels])
+        
+        print(f"Sample weights stats:")
+        print(f"  Min: {sample_weights.min():.4f}")
+        print(f"  Max: {sample_weights.max():.4f}")
+        print(f"  Mean: {sample_weights.mean():.4f}")
+        print(f"  Non-zero: {(sample_weights > 0).sum()} / {len(sample_weights)}")
+        
         sampler = WeightedRandomSampler(
-            num_samples = len(sample_weights),
-            weights = sample_weights,
+            weights=sample_weights.tolist(),  # Convert to list
+            num_samples=len(sample_weights),
             replacement=True,
         )
         return sampler
@@ -174,6 +214,22 @@ class ProstateDataset(Dataset):
 
     def get_metadata(self):
         return self.metadata
+
+    def get_label_indices(self):
+        """Returns dict mapping class -> list of indices. Cached."""
+        if self._label_indices is None:
+            self._label_indices = {c: [] for c in range(5)}
+            for idx, meta in enumerate(self.metadata):
+                primus = meta['primus']
+                try:
+                    label = int(float(primus)) - 1
+                except (TypeError, ValueError):
+                    label = 0
+                
+                if 0 <= label < 5:
+                    self._label_indices[label].append(idx)
+        
+        return self._label_indices
 
 
 def get_datasets(*, cfg, **kwargs):
@@ -228,6 +284,7 @@ def get_datasets(*, cfg, **kwargs):
             case_ids=case_ids,
             transform=transform,
             needle_mask_fname=needle_mask_fname,
+            UA_only=cfg.UA_only
         )
     
     # use all cases
@@ -288,3 +345,38 @@ def get_datasets(*, cfg, **kwargs):
 
 
 
+
+class BalancedBatchSampler(BatchSampler):
+    def __init__(self, dataset, batch_size, num_classes):
+        self.batch_size = batch_size
+        self.num_classes = num_classes
+        
+        # Get pre-computed indices (INSTANT!)
+        self.class_indices = dataset.get_label_indices()
+        
+        print(f"Class distribution: {{{', '.join([f'{c}: {len(self.class_indices[c])}' for c in range(num_classes)])}}}")
+        
+        self.samples_per_class = max(1, batch_size // num_classes)
+        self.num_batches = min(len(self.class_indices[c]) for c in range(num_classes)) // self.samples_per_class
+    
+    def __iter__(self):
+        # Shuffle within each class
+        shuffled_indices = {
+            c: np.random.permutation(self.class_indices[c]).tolist()
+            for c in range(self.num_classes)
+        }
+        
+        pointers = [0] * self.num_classes
+        
+        for _ in range(self.num_batches):
+            batch = []
+            for c in range(self.num_classes):
+                ptr = pointers[c]
+                batch.extend(shuffled_indices[c][ptr:ptr + self.samples_per_class])
+                pointers[c] += self.samples_per_class
+            
+            np.random.shuffle(batch)
+            yield batch[:self.batch_size]
+    
+    def __len__(self):
+        return self.num_batches
